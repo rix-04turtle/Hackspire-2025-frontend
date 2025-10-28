@@ -2,7 +2,7 @@ import React from 'react'
 
 const User = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-600 via-pink-500 to-red-500 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
         {/* Main Card */}
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-12 border border-white/20">
