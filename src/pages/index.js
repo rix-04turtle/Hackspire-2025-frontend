@@ -14,7 +14,7 @@ const HomeApp = () => {
       <ol className="list pl-4 space-y-2">
         {PAGES.map((page) => (
           <li className="list-item bg-gray-100 p-2 rounded-md" key={page.path}>
-            <a className="text-blue-500 hover:underline hover:text-blue-700 transition-colors" href={page.path}>{page.name} [ {page.path} ]</a>
+            <a className="text-blue-500 hover:underline hover:text-blue-700 transition-colors" target='_blank' href={page.path}>{page.name} [ {page.path} ]</a>
           </li>
         ))}
       </ol>
