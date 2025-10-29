@@ -3,6 +3,7 @@ import React from 'react'
 const HomeApp = () => {
   const PAGES = [
     { name: 'Home', path: '/' },
+    { name: 'Login', path: '/login' },
   ]
 
   return (
@@ -10,10 +11,10 @@ const HomeApp = () => {
       <h1>Farming Helper App</h1>
 
       <h3 >All the pages in the App</h3>
-      <ol>
+      <ol className="list pl-4 space-y-2">
         {PAGES.map((page) => (
-          <li key={page.path}>
-            <a href={page.path}>{page.name}</a>
+          <li className="list-item bg-gray-100 p-2 rounded-md" key={page.path}>
+            <a className="text-blue-500 hover:underline hover:text-blue-700 transition-colors" href={page.path}>{page.name} [ {page.path} ]</a>
           </li>
         ))}
       </ol>
