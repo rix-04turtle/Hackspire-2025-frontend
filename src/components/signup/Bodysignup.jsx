@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { GalleryVerticalEnd } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -12,55 +10,72 @@ import {
     FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useRouter } from 'next/router'
 
-const BodyLogin = ({ className, ...props }) => {
-    const router = useRouter()
+const Bodysignup = ({ className, ...props }) => {
+    const router = useRouter();
     const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    })
-    const [error, setError] = useState('')
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+    });
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.id]: e.target.value
-        })
-    }
+        });
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        setError('')
+        e.preventDefault();
+        setError("");
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
 
         try {
-            console.log('Sending login request:', formData);
-
-            const response = await fetch('http://localhost:3001/api/login', {
+            console.log('Attempting to connect to backend...');
+            
+            const response = await fetch('http://localhost:3001/api/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify(formData)
-            })
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password
+                })
+            }).catch(err => {
+                console.error('Network error:', err);
+                throw new Error('Backend server is not running. Please start the server.');
+            });
 
-            const data = await response.json()
-            console.log('Login response:', data);
+            const data = await response.json();
+            console.log('Signup response:', data);
 
             if (response.ok) {
-                localStorage.setItem('token', data.token)
-                router.push('/home')
+                alert('Account created successfully! Please log in.');
+                router.push('/login');
             } else {
-                setError(data.message || 'Invalid credentials. Make sure you have signed up first.')
+                setError(data.message || 'Something went wrong');
             }
         } catch (err) {
-            console.error('Login error:', err);
-            setError('Network error. Please make sure the backend server is running.')
+            console.error('Signup error:', err);
+            setError('Network error. Please try again.');
         }
-    }
+    };
 
     return (
         <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div className="w-full max-w-sm">
+
                 <div className={cn("flex flex-col gap-6", className)} {...props}>
                     <form onSubmit={handleSubmit}>
                         <FieldGroup>
@@ -76,14 +91,25 @@ const BodyLogin = ({ className, ...props }) => {
                                 </a>
                                 <h1 className="text-xl font-bold">Welcome to Acme Inc.</h1>
                                 <FieldDescription>
-                                    Don&apos;t have an account? <Link href="/signup" className="text-primary hover:underline">Sign up</Link>
+                                    Sign up your account now? Already have an account? <a href="/login" className="text-primary hover:underline">Login</a>
                                 </FieldDescription>
-                            </div>
+                            </div>  
                             {error && (
                                 <div className="text-red-500 text-sm text-center">
                                     {error}
                                 </div>
                             )}
+                            <Field>
+                                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                                <Input
+                                    id="name"
+                                    type="text"
+                                    placeholder="John Doe"
+                                    required
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                />
+                            </Field>
                             <Field>
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
                                 <Input
@@ -108,7 +134,19 @@ const BodyLogin = ({ className, ...props }) => {
                                 />
                             </Field>
                             <Field>
-                                <Button type="submit" className="w-full">Login</Button>
+                                <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+                                <Input
+                                    id="confirmPassword"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    required
+                                    minLength={8}
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                />
+                            </Field>
+                            <Field>
+                                <Button type="submit" className="w-full">CREATE ACCOUNT</Button>
                             </Field>
                             <FieldSeparator>Or</FieldSeparator>
                             <Field className="grid gap-4 sm:grid-cols-2">
@@ -144,4 +182,4 @@ const BodyLogin = ({ className, ...props }) => {
     )
 }
 
-export default BodyLogin
+export default Bodysignup

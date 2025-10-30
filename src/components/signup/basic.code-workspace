@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../../Hackspire-2025-backend"
+		},
+		{
+			"name": "Hackspire-2025-frontend-1",
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Hackspire-2025-frontend-1"
+	}
+}
