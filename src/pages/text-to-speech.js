@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Loader2 } from 'lucide-react';
+import { Volume2, Loader2, StopCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const TextToSpeechPage = () => {
     const [text, setText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [apiPreference, setApiPreference] = useState('browser'); // 'browser' or 'elevenlabs'
     const [isBrowserApiSupported, setIsBrowserApiSupported] = useState(false);
+    const [currentAudio, setCurrentAudio] = useState(null);
 
     useEffect(() => {
         const supported = 'speechSynthesis' in window;
@@ -14,9 +16,36 @@ const TextToSpeechPage = () => {
         if (!supported) {
             setApiPreference('elevenlabs');
         }
-    }, []);
+
+        // Cleanup audio on component unmount
+        return () => {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        };
+    }, [currentAudio]);
+
+    const stopPlayback = () => {
+        if (apiPreference === 'browser' && isBrowserApiSupported) {
+            window.speechSynthesis.cancel();
+            setIsPlaying(false);
+        } else if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            setIsPlaying(false);
+        }
+        setIsLoading(false);
+    };
 
     const handleSpeak = async () => {
+        if (isPlaying) {
+            stopPlayback();
+            return;
+        }
+
         if (text.trim() === '') {
             alert('Please enter some text to speak.');
             return;
@@ -25,11 +54,14 @@ const TextToSpeechPage = () => {
         // Use browser API if preferred and supported
         if (apiPreference === 'browser' && isBrowserApiSupported) {
             const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onstart = () => setIsPlaying(true);
+            utterance.onend = () => setIsPlaying(false);
+            utterance.onerror = () => setIsPlaying(false);
             window.speechSynthesis.speak(utterance);
         } else {
             // Fallback to ElevenLabs API via our backend
             setIsLoading(true);
-
+            setIsPlaying(true);
 
             try {
                 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -53,9 +85,12 @@ const TextToSpeechPage = () => {
                 const audioBlob = await response.blob();
                 const audioUrl = URL.createObjectURL(audioBlob);
                 const audio = new Audio(audioUrl);
+                setCurrentAudio(audio);
                 audio.play();
                 audio.onended = () => {
                     URL.revokeObjectURL(audioUrl);
+                    setIsPlaying(false);
+                    setCurrentAudio(null);
                 };
 
             } catch (error) {
@@ -65,6 +100,7 @@ const TextToSpeechPage = () => {
                 } else {
                     alert(`Sorry, we could not generate the speech. Error: ${error.message}`);
                 }
+                setIsPlaying(false);
             } finally {
                 setIsLoading(false);
             }
@@ -112,10 +148,12 @@ const TextToSpeechPage = () => {
                     <Button onClick={handleSpeak} size="lg" className="flex-shrink-0" disabled={isLoading}>
                         {isLoading ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
+                        ) : isPlaying ? (
+                            <StopCircle className="h-6 w-6" />
                         ) : (
                             <Volume2 className="h-6 w-6" />
                         )}
-                        <span className="sr-only">Speak</span>
+                        <span className="sr-only">{isPlaying ? 'Stop' : 'Speak'}</span>
                     </Button>
                 </div>
                 <div className="text-center text-xs text-gray-500">

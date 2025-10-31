@@ -5,14 +5,51 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
-import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle } from 'lucide-react'
 
 const BodyCropDoctor = () => {
     const [image, setImage] = useState(null)
     const [preview, setPreview] = useState(null)
     const [analysis, setAnalysis] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [language, setLanguage] = useState('English')
+    const [isSpeaking, setIsSpeaking] = useState(false)
     const fileInputRef = useRef(null)
+
+    const speakText = (text) => {
+        if ('speechSynthesis'in window) {
+            if (isSpeaking) {
+                window.speechSynthesis.cancel()
+                setIsSpeaking(false)
+                return
+            }
+            window.speechSynthesis.cancel() // Stop any previous speech
+            const utterance = new SpeechSynthesisUtterance(text)
+
+            // Set language and voice
+            const langCode = {
+                English: 'en',
+                Hindi: 'hi',
+                Bengali: 'bn'
+            }[language]
+
+            utterance.lang = langCode
+            const voices = window.speechSynthesis.getVoices()
+            const voice = voices.find(v => v.lang.startsWith(langCode))
+            if (voice) {
+                utterance.voice = voice
+            }
+
+            utterance.onstart = () => setIsSpeaking(true)
+            utterance.onend = () => setIsSpeaking(false)
+            utterance.onerror = () => setIsSpeaking(false)
+
+            window.speechSynthesis.speak(utterance)
+        } else {
+            alert('Sorry, your browser does not support text-to-speech.')
+        }
+    }
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0]
@@ -36,7 +73,7 @@ const BodyCropDoctor = () => {
             reader.onloadend = async () => {
                 const base64Image = reader.result.split(',')[1]
 
-                const prompt = `Analyze this crop/plant image and return your response in the following JSON format:
+                const prompt = `Analyze this crop/plant image and return your response in the following JSON format. The entire response, including keys and values in the JSON, must be in ${language}.
 {
   "cropName": "name of the crop/plant",
   "healthStatus": "healthy/diseased/pest-infested",
@@ -131,6 +168,19 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                 <p className="text-muted-foreground mt-2">Upload an image of your crop to get an AI-powered analysis.</p>
             </div>
 
+            <div className="max-w-xs mx-auto mb-6">
+                <Select onValueChange={setLanguage} defaultValue={language}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="English">English</SelectItem>
+                        <SelectItem value="Hindi">Hindi</SelectItem>
+                        <SelectItem value="Bengali">Bengali</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
             <Card className="max-w-2xl mx-auto">
                 <CardContent className="p-6">
                     <div
@@ -170,8 +220,15 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                 <div className="max-w-2xl mx-auto mt-8 space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>{analysis.cropName}</CardTitle>
-                            <CardDescription>Confidence: {analysis.confidence}</CardDescription>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <CardTitle>{analysis.cropName}</CardTitle>
+                                    <CardDescription>Confidence: {analysis.confidence}</CardDescription>
+                                </div>
+                                <Button variant="ghost" size="icon" onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}>
+                                    {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <Badge variant={getHealthStatusVariant(analysis.healthStatus)}>{analysis.healthStatus}</Badge>
@@ -190,7 +247,12 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                         <div className="flex-1">
                                             <div className="flex justify-between items-center">
                                                 <h4 className="font-semibold">{issue.name}</h4>
-                                                <Badge variant={getSeverityVariant(issue.severity)}>{issue.severity}</Badge>
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant={getSeverityVariant(issue.severity)}>{issue.severity}</Badge>
+                                                    <Button variant="ghost" size="icon" onClick={() => speakText(`Issue: ${issue.name}. Severity: ${issue.severity}. Description: ${issue.description.join('. ')}.`)}>
+                                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                                    </Button>
+                                                </div>
                                             </div>
                                             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mt-1">
                                                 {issue.description.map((point, i) => <li key={i}>{point}</li>)}
@@ -210,7 +272,12 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                             <CardContent className="space-y-6">
                                 {analysis.treatments.natural?.length > 0 && (
                                     <div>
-                                        <h4 className="font-semibold flex items-center gap-2 mb-2"><Leaf className="h-5 w-5 text-green-500" /> Natural Remedies</h4>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h4 className="font-semibold flex items-center gap-2"><Leaf className="h-5 w-5 text-green-500" /> Natural Remedies</h4>
+                                            <Button variant="ghost" size="icon" onClick={() => speakText(`Natural Remedies. ${analysis.treatments.natural.map(rec => `${rec.method}: ${rec.details.join('. ')}`).join('. ')}`)}>
+                                                {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                            </Button>
+                                        </div>
                                         <div className="space-y-3">
                                             {analysis.treatments.natural.map((rec, index) => (
                                                 <div key={index} className="text-sm pl-7">
@@ -225,7 +292,12 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                 )}
                                 {analysis.treatments.chemical?.length > 0 && (
                                     <div>
-                                        <h4 className="font-semibold flex items-center gap-2 mb-2"><FlaskConical className="h-5 w-5 text-orange-500" /> Chemical Treatments</h4>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h4 className="font-semibold flex items-center gap-2"><FlaskConical className="h-5 w-5 text-orange-500" /> Chemical Treatments</h4>
+                                            <Button variant="ghost" size="icon" onClick={() => speakText(`Chemical Treatments. ${analysis.treatments.chemical.map(rec => `${rec.pesticideName}: ${rec.application.join('. ')}`).join('. ')}`)}>
+                                                {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                            </Button>
+                                        </div>
                                         <div className="space-y-3">
                                             {analysis.treatments.chemical.map((rec, index) => (
                                                 <div key={index} className="text-sm pl-7">
@@ -245,7 +317,12 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     {analysis.preventiveMeasures?.length > 0 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Preventive Measures</CardTitle>
+                                <div className="flex justify-between items-center">
+                                    <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Preventive Measures</CardTitle>
+                                    <Button variant="ghost" size="icon" onClick={() => speakText(`Preventive Measures. ${analysis.preventiveMeasures.join('. ')}`)}>
+                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
@@ -260,7 +337,12 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     {analysis.estimatedRecoveryTime && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Clock className="h-5 w-5" /> Estimated Recovery Time</CardTitle>
+                                <div className="flex justify-between items-center">
+                                    <CardTitle className="flex items-center gap-2"><Clock className="h-5 w-5" /> Estimated Recovery Time</CardTitle>
+                                    <Button variant="ghost" size="icon" onClick={() => speakText(`Estimated Recovery Time: ${analysis.estimatedRecoveryTime}`)}>
+                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-lg font-medium">{analysis.estimatedRecoveryTime}</p>
