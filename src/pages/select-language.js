@@ -23,11 +23,11 @@ export default function LanguageSelect() {
       console.log('Selected language:', langCode);
       setSelectedLang(langCode);
       localStorage.setItem('preferredLanguage', langCode);
-      router.push('/login');
+      // router.push('/login');
     } catch (error) {
       console.error('Error selecting language:', error);
       // Fallback to English if there's an error
-      router.push('/login');
+      // router.push('/login');
     }
   };
 
