@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle } from 'lucide-react'
+import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X } from 'lucide-react'
 
 const BetaBodyCropDoctor = () => {
     const [image, setImage] = useState(null)
@@ -188,33 +188,42 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
     }
 
     return (
-        <div className="container mx-auto p-4 md:p-8">
-            <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold tracking-tight">Crop Doctor</h1>
-                <p className="text-muted-foreground mt-2">Upload an image of your crop to get an AI-powered analysis.</p>
-            </div>
-
-            <div className="max-w-xs mx-auto mb-6">
-                <Select onValueChange={setLanguage} defaultValue={language}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="English">English</SelectItem>
-                        <SelectItem value="Hindi">Hindi</SelectItem>
-                        <SelectItem value="Bengali">Bengali</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100">
+            <div className="container mx-auto p-4 md:p-8">
+                <div className="text-center mb-12">
+                    <h1 className="text-5xl font-bold tracking-tight text-green-800 mb-4">Crop Doctor</h1>
+                    <p className="text-lg text-green-700 max-w-2xl mx-auto">
+                        Upload an image of your crop and let our AI-powered system diagnose and provide treatment recommendations.
+                    </p>
+                    <div className="max-w-xs mx-auto mt-6">
+                        <Select onValueChange={setLanguage} defaultValue={language}>
+                            <SelectTrigger className="bg-white/80 backdrop-blur-sm border-green-200">
+                                <SelectValue placeholder="Select language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="English">English</SelectItem>
+                                <SelectItem value="Hindi">Hindi</SelectItem>
+                                <SelectItem value="Bengali">Bengali</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
 
             <Card className="max-w-2xl mx-auto">
                 <CardContent className="p-6">
                     <div
-                        className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors"
+                        className="border-2 border-dashed border-green-300 rounded-xl p-8 text-center cursor-pointer hover:bg-green-50/50 transition-all group relative overflow-hidden"
                         onClick={() => fileInputRef.current?.click()}
                     >
-                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                        <p className="mt-4 text-muted-foreground">Click to upload or drag and drop an image</p>
+                        <div className="relative z-10">
+                            <div className="bg-green-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
+                                <Upload className="h-10 w-10 text-green-600 group-hover:scale-110 transition-transform" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-green-800 mb-2">Upload Your Crop Image</h3>
+                            <p className="text-green-600">Click to upload or drag and drop</p>
+                            <p className="text-sm text-green-500 mt-2">Supports: JPG, PNG</p>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-100/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Input
                             ref={fileInputRef}
                             type="file"
@@ -225,39 +234,74 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     </div>
 
                     {preview && (
-                        <div className="mt-6">
-                            <img src={preview} alt="Preview" className="max-w-full mx-auto rounded-lg shadow-md" />
+                        <div className="mt-6 relative group">
+                            <div className="relative rounded-xl overflow-hidden shadow-lg">
+                                <img src={preview} alt="Preview" className="max-w-full mx-auto" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-green-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setImage(null);
+                                    setPreview(null);
+                                }}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
                     )}
 
                     <Button
                         onClick={analyzeImage}
                         disabled={!image || loading}
-                        className="w-full mt-6"
+                        className={`w-full mt-6 text-lg font-semibold h-12 ${!image ? 'opacity-50' : 'hover:scale-[1.02]'}`}
                         size="lg"
                     >
-                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        {loading ? 'Analyzing...' : 'Analyze Crop'}
+                        {loading ? (
+                            <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Analyzing...
+                            </>
+                        ) : (
+                            <>
+                                <Leaf className="mr-2 h-5 w-5" />
+                                Analyze Crop
+                            </>
+                        )}
                     </Button>
                 </CardContent>
             </Card>
 
             {analysis && !analysis.error && (
                 <div className="max-w-2xl mx-auto mt-8 space-y-6">
-                    <Card>
-                        <CardHeader>
+                    <Card className="backdrop-blur-sm bg-white/90 border-green-100 shadow-lg overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent pointer-events-none" />
+                        <CardHeader className="relative">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <CardTitle>{analysis.cropName}</CardTitle>
-                                    <CardDescription>Confidence: {analysis.confidence}</CardDescription>
+                                    <CardTitle className="text-2xl text-green-800">{analysis.cropName}</CardTitle>
+                                    <CardDescription className="text-green-600">Confidence: {analysis.confidence}</CardDescription>
                                 </div>
-                                <Button variant="ghost" size="icon" onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}>
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="border-green-200 hover:bg-green-50"
+                                    onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}
+                                >
                                     {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                                 </Button>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <Badge variant={getHealthStatusVariant(analysis.healthStatus)}>{analysis.healthStatus}</Badge>
+                        <CardContent className="relative">
+                            <Badge 
+                                variant={getHealthStatusVariant(analysis.healthStatus)}
+                                className="text-sm px-4 py-1 font-medium"
+                            >
+                                {analysis.healthStatus}
+                            </Badge>
                         </CardContent>
                     </Card>
 
@@ -385,8 +429,9 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     <AlertDescription>{analysis.error}</AlertDescription>
                 </Alert>
             )}
+            </div>
         </div>
-    )
-}
+    );
+};
 
-export default BetaBodyCropDoctor
+export default BetaBodyCropDoctor;
