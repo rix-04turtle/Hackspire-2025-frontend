@@ -15,39 +15,65 @@ const BodyCropDoctor = () => {
     const [loading, setLoading] = useState(false)
     const [language, setLanguage] = useState('English')
     const [isSpeaking, setIsSpeaking] = useState(false)
+    const [currentAudio, setCurrentAudio] = useState(null)
     const fileInputRef = useRef(null)
 
-    const speakText = (text) => {
-        if ('speechSynthesis'in window) {
-            if (isSpeaking) {
-                window.speechSynthesis.cancel()
+    const speakText = async (text) => {
+        // Stop if already speaking
+        if (isSpeaking && currentAudio) {
+            currentAudio.pause()
+            currentAudio.currentTime = 0
+            setIsSpeaking(false)
+            setCurrentAudio(null)
+            return
+        }
+
+        setIsSpeaking(true)
+
+        try {
+            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+            const API = `${BASE_URL}/apis/text-to-speech`
+
+            const params = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text }),
+            }
+
+            const response = await fetch(API, params)
+
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({ error: 'Failed to parse error from backend.' }))
+                throw new Error(errorBody.error || 'Failed to generate speech.')
+            }
+
+            const audioBlob = await response.blob()
+            const audioUrl = URL.createObjectURL(audioBlob)
+            const audio = new Audio(audioUrl)
+            setCurrentAudio(audio)
+            
+            audio.play()
+            audio.onended = () => {
+                URL.revokeObjectURL(audioUrl)
                 setIsSpeaking(false)
-                return
+                setCurrentAudio(null)
             }
-            window.speechSynthesis.cancel() // Stop any previous speech
-            const utterance = new SpeechSynthesisUtterance(text)
-
-            // Set language and voice
-            const langCode = {
-                English: 'en',
-                Hindi: 'hi',
-                Bengali: 'bn'
-            }[language]
-
-            utterance.lang = langCode
-            const voices = window.speechSynthesis.getVoices()
-            const voice = voices.find(v => v.lang.startsWith(langCode))
-            if (voice) {
-                utterance.voice = voice
+            audio.onerror = () => {
+                URL.revokeObjectURL(audioUrl)
+                setIsSpeaking(false)
+                setCurrentAudio(null)
+                alert('Error playing audio.')
             }
-
-            utterance.onstart = () => setIsSpeaking(true)
-            utterance.onend = () => setIsSpeaking(false)
-            utterance.onerror = () => setIsSpeaking(false)
-
-            window.speechSynthesis.speak(utterance)
-        } else {
-            alert('Sorry, your browser does not support text-to-speech.')
+        } catch (error) {
+            console.error('Error with TTS fetch:', error)
+            if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                alert('Could not connect to the backend server. Please ensure it is running and accessible.')
+            } else {
+                alert(`Sorry, we could not generate the speech. Error: ${error.message}`)
+            }
+            setIsSpeaking(false)
         }
     }
 
