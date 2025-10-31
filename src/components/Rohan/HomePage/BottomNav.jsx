@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Home, Leaf, MessageCircle, Settings } from 'lucide-react';
+import { Home, Leaf, MessageCircle, User } from 'lucide-react';
 
 export default function BottomNav() {
   const router = useRouter();
@@ -14,8 +14,8 @@ export default function BottomNav() {
       icon: Home
     },
     {
-      href: '/crop-guide',
-      label: 'Guide',
+      href: '/crop-news',
+      label: 'News',
       icon: Leaf
     },
     {
@@ -24,9 +24,14 @@ export default function BottomNav() {
       icon: MessageCircle
     },
     {
-      href: '/settings',
-      label: 'Settings',
-      icon: Settings
+      href: '/marketplace',
+      label: 'Marketplace',
+      icon: Leaf  
+    },
+    {
+      href: '/profile',
+      label: 'Profile',
+      icon: User
     }
   ];
 
