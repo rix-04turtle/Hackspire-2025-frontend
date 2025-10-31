@@ -35,7 +35,7 @@ const BodyLogin = ({ className, ...props }) => {
         try {
             console.log('Sending login request:', formData);
 
-            const response = await fetch('http://localhost:4000/api/users/login', {
+            const response = await fetch('http://localhost:3001/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,8 +100,8 @@ const BodyLogin = ({ className, ...props }) => {
                                 <Input
                                     id="password"
                                     type="password"
-                                    placeholder="enter your password"
-                            
+                                    placeholder="••••••••"
+                                    required
                                     minLength={8}
                                     value={formData.password}
                                     onChange={handleChange}
