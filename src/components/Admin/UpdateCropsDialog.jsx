@@ -6,19 +6,24 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const UpdateCropsDialog = ({ state, crops, onUpdate, children }) => {
     const [open, setOpen] = useState(false);
     const [selectedCrops, setSelectedCrops] = useState(state.crops || []);
 
     const handleUpdate = async () => {
+        const API = `${BASE_URL}/indian-states/update-crops`
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ stateId: state._id, cropIds: selectedCrops }),
+        }
+
         try {
-            const response = await fetch('http://localhost:4000/indian-states/update-crops', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ stateId: state._id, cropIds: selectedCrops }),
-            });
+            const response = await fetch(API, params);
 
             if (!response.ok) {
                 throw new Error('Failed to update crops');

@@ -13,6 +13,8 @@ import {
 import { RefreshCw } from "lucide-react";
 import { useEffect, useState } from 'react';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const BodyCropsPage = () => {
 
   const [crops, setCrops] = useState([]);
@@ -21,8 +23,11 @@ const BodyCropsPage = () => {
 
   const fetchCrops = async () => {
     setLoading(true);
+
+
+    const API = `${BASE_URL}/crops/get-all`
     try {
-      const response = await fetch('http://localhost:4000/crops/get-all');
+      const response = await fetch(API);
       if (!response.ok) {
         throw new Error('Failed to fetch crops');
       }

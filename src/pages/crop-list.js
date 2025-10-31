@@ -42,7 +42,7 @@ export default function CropListPage() {
                 }
                 setStateName(state);
 
-                const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+                const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
                 const stateBody = {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },

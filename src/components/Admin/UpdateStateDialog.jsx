@@ -13,19 +13,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+
 const UpdateStateDialog = ({ state, onUpdate, children }) => {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState(state.name);
 
     const handleUpdate = async () => {
+
+        const API = `${BASE_URL}/indian-states/update-name`
+        const params = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ stateId: state._id, name }),
+        }
+
         try {
-            const response = await fetch('http://localhost:4000/indian-states/update-name', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ stateId: state._id, name }),
-            });
+            const response = await fetch(API, params);
 
             if (!response.ok) {
                 throw new Error('Failed to update state name');

@@ -17,19 +17,22 @@ import UpdateCropsDialog from './UpdateCropsDialog';
 
 import { RefreshCw } from "lucide-react";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const BodyIndianStates = () => {
 
-     const [states, setStates] = useState([]);
+    const [states, setStates] = useState([]);
     const [crops, setCrops] = useState(new Map());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const fetchData = async () => {
+
         setLoading(true);
         try {
             const [statesResponse, cropsResponse] = await Promise.all([
-                fetch('http://localhost:4000/indian-states/get-all'),
-                fetch('http://localhost:4000/crops/get-all')
+                fetch(`${BASE_URL}/indian-states/get-all`),
+                fetch(`${BASE_URL}/crops/get-all`)
             ]);
 
             if (!statesResponse.ok || !cropsResponse.ok) {
@@ -63,8 +66,8 @@ const BodyIndianStates = () => {
         setStates(states.map(state => state._id === stateId ? { ...state, crops: newCrops } : state));
     };
 
-  return (
-   <div className="min-h-screen bg-gray-100">
+    return (
+        <div className="min-h-screen bg-gray-100">
             <Head>
                 <title>Indian States and Crops</title>
                 <meta name="description" content="A list of Indian states and their major crops." />
@@ -113,7 +116,7 @@ const BodyIndianStates = () => {
                 </Table>
             </main>
         </div>
-  )
+    )
 }
 
 export default BodyIndianStates
