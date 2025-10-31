@@ -41,7 +41,7 @@ const Bodysignup = ({ className, ...props }) => {
         try {
             console.log('Attempting to connect to backend...');
             
-            const response = await fetch('http://localhost:3001/api/signup', {
+            const response = await fetch('http://localhost:4000/api/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -175,6 +175,24 @@ const Bodysignup = ({ className, ...props }) => {
                         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
                         and <a href="#">Privacy Policy</a>.
                     </FieldDescription>
+
+                    {/* Continue as guest button placed at the bottom of signup page */}
+                    <div className="mt-4 text-center">
+                        <Button
+                            variant="ghost"
+                            type="button"
+                            onClick={() => {
+                                try {
+                                    localStorage.setItem('guest', 'true');
+                                } catch (err) {
+                                    console.warn('Could not set guest flag in localStorage', err);
+                                }
+                                router.push('/home');
+                            }}
+                        >
+                            Continue as guest
+                        </Button>
+                    </div>
                 </div>
 
             </div>
