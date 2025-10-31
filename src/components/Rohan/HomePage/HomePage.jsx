@@ -6,6 +6,7 @@ import RainProbability from './RainProbability';
 import CropDoctor from './CropDoctor';
 import BottomNav from './BottomNav';
 import ChatBot from './ChatBot';
+import Script from 'next/script';
 
 const Homepage = () => {
   return (
@@ -126,8 +127,8 @@ const Homepage = () => {
           </section>
         </main>
 
-        {/* Chatbot with improved positioning */}
-        <div className="fixed bottom-20 right-4 z-40 animate-fade-in-up delay-300">
+        {/* Chatbot with improved positioning: TEMPORARILY DISABLED */}
+        {/* <div className="fixed bottom-20 right-4 z-40 animate-fade-in-up delay-300">
           <div className="transform hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-500 ease-out">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl 
@@ -137,11 +138,13 @@ const Homepage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Bottom Navigation */}
         <BottomNav />
       </div>
+      <elevenlabs-convai agent-id="agent_3501k8xn1jg6fsk8j9abme625s3e"></elevenlabs-convai>
+      <Script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></Script>
     </div>
   );
 };
