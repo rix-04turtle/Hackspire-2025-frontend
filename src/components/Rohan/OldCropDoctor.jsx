@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X } from 'lucide-react'
+import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle } from 'lucide-react'
 
-const BetaBodyCropDoctor = () => {
+const OldBodyCropDoctor = () => {
     const [image, setImage] = useState(null)
     const [preview, setPreview] = useState(null)
     const [analysis, setAnalysis] = useState(null)
@@ -17,14 +17,6 @@ const BetaBodyCropDoctor = () => {
     const [isSpeaking, setIsSpeaking] = useState(false)
     const [currentAudio, setCurrentAudio] = useState(null)
     const fileInputRef = useRef(null)
-
-    // Function to find all matching products from marketplace
-    const findMarketplaceProducts = (pesticideName) => {
-        return marketplaceProducts.filter(product =>
-            product.name.toLowerCase().includes(pesticideName.toLowerCase()) ||
-            pesticideName.toLowerCase().includes(product.name.toLowerCase())
-        )
-    }
 
     const speakText = async (text) => {
         // Stop if already speaking
@@ -61,7 +53,7 @@ const BetaBodyCropDoctor = () => {
             const audioUrl = URL.createObjectURL(audioBlob)
             const audio = new Audio(audioUrl)
             setCurrentAudio(audio)
-
+            
             audio.play()
             audio.onended = () => {
                 URL.revokeObjectURL(audioUrl)
@@ -132,8 +124,7 @@ const BetaBodyCropDoctor = () => {
         "pesticideName": "Name of the chemical pesticide/fertilizer",
         "application": ["Detailed point-wise instructions on how and when to apply"]
       }
-    ],
-    "chemicalPesticideNames": ["Array of just the chemical pesticide/fertilizer names as strings"]
+    ]
   },
   "preventiveMeasures": ["list of preventive measures"],
   "estimatedRecoveryTime": "time estimate"
@@ -197,42 +188,33 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100">
-            <div className="container mx-auto p-4 md:p-8">
-                <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold tracking-tight text-green-800 mb-4">Crop Doctor</h1>
-                    <p className="text-lg text-green-700 max-w-2xl mx-auto">
-                        Upload an image of your crop and let our AI-powered system diagnose and provide treatment recommendations.
-                    </p>
-                    <div className="max-w-xs mx-auto mt-6">
-                        <Select onValueChange={setLanguage} defaultValue={language}>
-                            <SelectTrigger className="bg-white/80 backdrop-blur-sm border-green-200">
-                                <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="English">English</SelectItem>
-                                <SelectItem value="Hindi">Hindi</SelectItem>
-                                <SelectItem value="Bengali">Bengali</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
+        <div className="container mx-auto p-4 md:p-8">
+            <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold tracking-tight">Crop Doctor</h1>
+                <p className="text-muted-foreground mt-2">Upload an image of your crop to get an AI-powered analysis.</p>
+            </div>
+
+            <div className="max-w-xs mx-auto mb-6">
+                <Select onValueChange={setLanguage} defaultValue={language}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="English">English</SelectItem>
+                        <SelectItem value="Hindi">Hindi</SelectItem>
+                        <SelectItem value="Bengali">Bengali</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
 
             <Card className="max-w-2xl mx-auto">
                 <CardContent className="p-6">
                     <div
-                        className="border-2 border-dashed border-green-300 rounded-xl p-8 text-center cursor-pointer hover:bg-green-50/50 transition-all group relative overflow-hidden"
+                        className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => fileInputRef.current?.click()}
                     >
-                        <div className="relative z-10">
-                            <div className="bg-green-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
-                                <Upload className="h-10 w-10 text-green-600 group-hover:scale-110 transition-transform" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-green-800 mb-2">Upload Your Crop Image</h3>
-                            <p className="text-green-600">Click to upload or drag and drop</p>
-                            <p className="text-sm text-green-500 mt-2">Supports: JPG, PNG</p>
-                        </div>
-                        <div className="absolute inset-0 bg-gradient-to-br from-green-100/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                        <p className="mt-4 text-muted-foreground">Click to upload or drag and drop an image</p>
                         <Input
                             ref={fileInputRef}
                             type="file"
@@ -243,74 +225,39 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     </div>
 
                     {preview && (
-                        <div className="mt-6 relative group">
-                            <div className="relative rounded-xl overflow-hidden shadow-lg">
-                                <img src={preview} alt="Preview" className="max-w-full mx-auto" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-green-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setImage(null);
-                                    setPreview(null);
-                                }}
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
+                        <div className="mt-6">
+                            <img src={preview} alt="Preview" className="max-w-full mx-auto rounded-lg shadow-md" />
                         </div>
                     )}
 
                     <Button
                         onClick={analyzeImage}
                         disabled={!image || loading}
-                        className={`w-full mt-6 text-lg font-semibold h-12 ${!image ? 'opacity-50' : 'hover:scale-[1.02]'}`}
+                        className="w-full mt-6"
                         size="lg"
                     >
-                        {loading ? (
-                            <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                Analyzing...
-                            </>
-                        ) : (
-                            <>
-                                <Leaf className="mr-2 h-5 w-5" />
-                                Analyze Crop
-                            </>
-                        )}
+                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {loading ? 'Analyzing...' : 'Analyze Crop'}
                     </Button>
                 </CardContent>
             </Card>
 
             {analysis && !analysis.error && (
                 <div className="max-w-2xl mx-auto mt-8 space-y-6">
-                    <Card className="backdrop-blur-sm bg-white/90 border-green-100 shadow-lg overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent pointer-events-none" />
-                        <CardHeader className="relative">
+                    <Card>
+                        <CardHeader>
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <CardTitle className="text-2xl text-green-800">{analysis.cropName}</CardTitle>
-                                    <CardDescription className="text-green-600">Confidence: {analysis.confidence}</CardDescription>
+                                    <CardTitle>{analysis.cropName}</CardTitle>
+                                    <CardDescription>Confidence: {analysis.confidence}</CardDescription>
                                 </div>
-                                <Button 
-                                    variant="outline" 
-                                    size="icon" 
-                                    className="border-green-200 hover:bg-green-50"
-                                    onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}
-                                >
+                                <Button variant="ghost" size="icon" onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}>
                                     {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                                 </Button>
                             </div>
                         </CardHeader>
-                        <CardContent className="relative">
-                            <Badge 
-                                variant={getHealthStatusVariant(analysis.healthStatus)}
-                                className="text-sm px-4 py-1 font-medium"
-                            >
-                                {analysis.healthStatus}
-                            </Badge>
+                        <CardContent>
+                            <Badge variant={getHealthStatusVariant(analysis.healthStatus)}>{analysis.healthStatus}</Badge>
                         </CardContent>
                     </Card>
 
@@ -393,83 +340,6 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                         </Card>
                     )}
 
-                    {analysis.treatments?.chemicalPesticideNames?.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <ShoppingCart className="h-5 w-5" />
-                                    Buy Chemical Products
-                                </CardTitle>
-                                <CardDescription>Purchase recommended pesticides and fertilizers online</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-6">
-                                    {analysis.treatments.chemicalPesticideNames.map((pesticideName, index) => {
-                                        const products = findMarketplaceProducts(pesticideName)
-
-                                        // Only render if products are found
-                                        if (products.length === 0) return null
-
-                                        return (
-                                            <div key={index} className="border-b pb-6 last:border-b-0 last:pb-0">
-                                                <h5 className="font-semibold text-lg mb-4 text-gray-800">{pesticideName}</h5>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {products.map((product, pIndex) => (
-                                                        <div key={pIndex} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white">
-                                                            {/* Product Image */}
-                                                            <div className="relative bg-gray-100 h-48 flex items-center justify-center">
-                                                                <img 
-                                                                    src={product.img} 
-                                                                    alt={product.name}
-                                                                    className="max-h-full max-w-full object-contain p-4"
-                                                                />
-                                                                {/* Marketplace Badge */}
-                                                                <Badge className="absolute top-2 right-2 bg-blue-600">
-                                                                    {product.marketPlaceName}
-                                                                </Badge>
-                                                            </div>
-                                                            
-                                                            {/* Product Details */}
-                                                            <div className="p-4">
-                                                                <h6 className="font-semibold text-sm text-gray-800 mb-2 line-clamp-2">
-                                                                    {product.name}
-                                                                </h6>
-                                                                
-                                                                {/* Price Section */}
-                                                                <div className="flex items-baseline gap-2 mb-3">
-                                                                    <span className="text-2xl font-bold text-gray-900">
-                                                                        ₹{product.price.toLocaleString('en-IN')}
-                                                                    </span>
-                                                                    <span className="text-sm text-gray-500">
-                                                                        Inclusive of all taxes
-                                                                    </span>
-                                                                </div>
-
-                                                                {/* Buy Button */}
-                                                                <a
-                                                                    href={product.link}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="block w-full"
-                                                                >
-                                                                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
-                                                                        <ShoppingCart className="h-4 w-4 mr-2" />
-                                                                        Buy Now
-                                                                        <ExternalLink className="h-3 w-3 ml-2" />
-                                                                    </Button>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
                     {analysis.preventiveMeasures?.length > 0 && (
                         <Card>
                             <CardHeader>
@@ -515,9 +385,8 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     <AlertDescription>{analysis.error}</AlertDescription>
                 </Alert>
             )}
-            </div>
         </div>
-    );
-};
+    )
+}
 
-export default BetaBodyCropDoctor;
+export default OldBodyCropDoctor

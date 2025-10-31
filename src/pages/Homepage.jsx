@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import { Leaf, Sun, Cloud, Droplets } from 'lucide-react';
+import { Leaf, Cloud, Droplets } from 'lucide-react';
+import Weather from '../components/Weather';
+import CropDoctor from '@/components/Rohan/HomePage/CropDoctor';
 
 const Homepage = () => {
   return (
@@ -8,9 +10,12 @@ const Homepage = () => {
       {/* Navigation Bar */}
       <nav className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Leaf className="h-6 w-6" />
-            FarmAdvisor
+            <div>
+                <div className="text-xl font-bold">Agnivani</div>
+                <div className="text-xs text-green-200">Growing a Sustainable Future</div>
+            </div>
           </Link>
           <div className="space-x-4">
             <Link href="/indian-states" className="hover:text-green-200 transition-colors">Indian States</Link>
@@ -42,12 +47,8 @@ const Homepage = () => {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-            <div className="bg-green-100 p-3 rounded-full w-fit mb-4">
-              <Sun className="h-6 w-6 text-green-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-green-900 mb-2">Smart Crop Analysis</h3>
-            <p className="text-green-700">Get AI-powered insights about your crops and optimize your farming decisions.</p>
+          <div className="hover:shadow-xl transition-shadow">
+            <CropDoctor />
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
@@ -55,7 +56,7 @@ const Homepage = () => {
               <Cloud className="h-6 w-6 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold text-green-900 mb-2">Weather Integration</h3>
-            <p className="text-green-700">Real-time weather updates and predictions to protect your crops.</p>
+            <Weather />
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
@@ -90,7 +91,7 @@ const Homepage = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <Leaf className="h-6 w-6" />
-              <span className="text-xl font-bold">FarmAdvisor</span>
+              <span className="text-xl font-bold">Agnivani</span>
             </div>
             <div className="space-x-4">
               <Link href="/about" className="hover:text-white transition-colors">About</Link>
@@ -99,7 +100,7 @@ const Homepage = () => {
             </div>
           </div>
           <div className="text-center mt-8 text-green-300">
-            © {new Date().getFullYear()} FarmAdvisor. All rights reserved.
+            © {new Date().getFullYear()} Agnivani. All rights reserved.
           </div>
         </div>
       </footer>
