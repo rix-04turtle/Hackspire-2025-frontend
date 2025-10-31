@@ -11,16 +11,21 @@ export default function Weather({ className = '' }) {
     async function fetchWeather(lat, lon) {
       try {
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m&timezone=auto`
         );
         const data = await res.json();
         if (!mounted) return;
         if (data && data.current_weather) {
+          // Get current hour's humidity
+          const currentHour = new Date().getHours();
+          const currentHumidity = data.hourly.relativehumidity_2m[currentHour];
+          
           setWeather({
             temp: data.current_weather.temperature,
             windspeed: data.current_weather.windspeed,
             winddir: data.current_weather.winddirection,
             weathercode: data.current_weather.weathercode,
+            humidity: currentHumidity,
           });
         } else {
           setError('No weather data available');
@@ -97,8 +102,9 @@ export default function Weather({ className = '' }) {
 
           <div className="text-right text-sm text-gray-600">
             {weather && !loading && (
-              <div>
+              <div className="space-y-1">
                 <div>Wind: {Math.round(weather.windspeed)} km/h</div>
+                <div>Humidity: {Math.round(weather.humidity)}%</div>
               </div>
             )}
           </div>
