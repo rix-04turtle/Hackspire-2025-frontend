@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import { useRouter } from 'next/router'
 import { GoogleGenAI } from '@google/genai'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X, ShoppingCart, ExternalLink } from 'lucide-react'
+import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X, ShoppingCart, ExternalLink, MessageCircle } from 'lucide-react'
 
 // Mock marketplace data - Replace with your actual API/data source
 const marketplaceProducts = [
@@ -18,6 +19,7 @@ const marketplaceProducts = [
 ]
 
 const BodyCropDoctor = () => {
+    const router = useRouter()
     const [image, setImage] = useState(null)
     const [preview, setPreview] = useState(null)
     const [analysis, setAnalysis] = useState(null)
@@ -26,6 +28,7 @@ const BodyCropDoctor = () => {
     const [isSpeaking, setIsSpeaking] = useState(false)
     const [currentAudio, setCurrentAudio] = useState(null)
     const fileInputRef = useRef(null)
+    const resultsRef = useRef(null)
 
     // Function to find all matching products from marketplace
     const findMarketplaceProducts = (pesticideName) => {
@@ -116,7 +119,7 @@ const BodyCropDoctor = () => {
             reader.onloadend = async () => {
                 const base64Image = reader.result.split(',')[1]
 
-                const prompt = `Analyze this crop/plant image and return your response in the following JSON format. The entire response, including keys and values in the JSON, must be in ${language}.
+                const prompt = `Analyze this crop/plant image and return your response in the following JSON format. The entire response, including keys and values in the JSON, must be in ${language}, EXCEPT for the "chemicalPesticideNames" array which must ALWAYS be in English (as these are used for product matching in our marketplace database).
 {
   "cropName": "name of the crop/plant",
   "healthStatus": "healthy/diseased/pest-infested",
@@ -142,11 +145,13 @@ const BodyCropDoctor = () => {
         "application": ["Detailed point-wise instructions on how and when to apply"]
       }
     ],
-    "chemicalPesticideNames": ["Array of just the chemical pesticide/fertilizer names as strings"]
+    "chemicalPesticideNames": ["Array of ENGLISH ONLY chemical pesticide/fertilizer names as strings - these must be in English regardless of the selected language"]
   },
   "preventiveMeasures": ["list of preventive measures"],
   "estimatedRecoveryTime": "time estimate"
 }
+
+IMPORTANT: The "chemicalPesticideNames" array must contain only English names of pesticides/fertilizers for product database matching. All other fields should be in ${language}.
 
 Provide accurate and detailed analysis. If the image is not a crop/plant, indicate that in the response.`
 
@@ -168,6 +173,11 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                 const parsedAnalysis = JSON.parse(responseText)
                 setAnalysis(parsedAnalysis)
                 setLoading(false)
+
+                // Auto-scroll to results after a brief delay to ensure DOM is updated
+                setTimeout(() => {
+                    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }, 100)
             }
 
             reader.readAsDataURL(image)
@@ -175,6 +185,11 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
             console.error('Error analyzing image:', error)
             setAnalysis({ error: 'Error analyzing image. Please try again.' })
             setLoading(false)
+
+            // Also scroll to error message
+            setTimeout(() => {
+                resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }, 100)
         }
     }
 
@@ -312,7 +327,7 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
 
                 {/* Analysis Results */}
                 {analysis && !analysis.error && (
-                    <div className="max-w-4xl mx-auto mt-8 space-y-6">
+                    <div ref={resultsRef} className="max-w-4xl mx-auto mt-8 space-y-6 scroll-mt-8">
                         <Card className="backdrop-blur-sm bg-white/90 border-green-100 shadow-lg overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent pointer-events-none" />
                             <CardHeader className="relative">
@@ -532,12 +547,40 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                 </CardContent>
                             </Card>
                         )}
+
+                        {/* Know More / Chat Button */}
+                        <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white border-none shadow-xl">
+                            <CardContent className="p-6">
+                                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <MessageCircle className="h-8 w-8" />
+                                        <div>
+                                            <h3 className="text-xl font-bold">Have More Questions?</h3>
+                                            <p className="text-green-100 text-sm">Chat with our AI expert about your crop and get personalized advice</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={() => {
+                                            // Store analysis in sessionStorage for the chatbot page
+                                            sessionStorage.setItem('cropAnalysis', JSON.stringify(analysis))
+                                            sessionStorage.setItem('selectedLanguage', language)
+                                            router.push('/beta/crop-chatbot')
+                                        }}
+                                        className="bg-white text-green-700 hover:bg-green-50 font-semibold px-6 py-3 text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                                        size="lg"
+                                    >
+                                        <MessageCircle className="h-5 w-5 mr-2" />
+                                        Know More
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
                 )}
 
                 {/* Error Display */}
                 {analysis && analysis.error && (
-                    <Alert variant="destructive" className="max-w-4xl mx-auto mt-8 border-red-300">
+                    <Alert ref={resultsRef} variant="destructive" className="max-w-4xl mx-auto mt-8 border-red-300 scroll-mt-8">
                         <AlertTriangle className="h-5 w-5" />
                         <AlertTitle className="text-lg font-semibold">Analysis Error</AlertTitle>
                         <AlertDescription className="text-base">{analysis.error}</AlertDescription>

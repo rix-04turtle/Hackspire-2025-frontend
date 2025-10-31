@@ -8,7 +8,8 @@ const IndexPage = () => {
         { name: "Signup", path: "/signup" },
         { name: "Crops", path: "/crops" },
         { name: "Indian States", path: "/indian-states" },
-        { name: "Crop Doctor[BETA", path: "/beta/image-upload" },
+        { name: "Crop Doctor [BETA]", path: "/beta/image-upload" },
+        { name: "Crop Chatbot [NEW]", path: "/beta/crop-chatbot" },
         { name: "Text TO Speech", path: "/text-to-speech" },
         { name: "Rohan's Home", path: "/rohan/home" }
     ]
