@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import Homepage from './HomePage'
+import Homepage from '../../components/Rohan/HomePage/HomePage'
 
 export default function Home() {
   const router = useRouter()
