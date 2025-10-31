@@ -46,20 +46,20 @@ const BodyCropDoctor = () => {
       "type": "disease/pest/nutrient-deficiency",
       "name": "specific name",
       "severity": "mild/moderate/severe",
-      "description": "detailed description of the issue and why it happens"
+      "description": ["detailed point-wise description of the issue and why it happens. No Paragraphy text"]
     }
   ],
   "treatments": {
     "natural": [
       {
         "method": "Name of the natural/homemade remedy",
-        "details": "Detailed instructions on how to prepare and apply it"
+        "details": ["Detailed point-wise instructions on how to prepare and apply it"]
       }
     ],
     "chemical": [
       {
         "pesticideName": "Name of the chemical pesticide/fertilizer",
-        "application": "Detailed instructions on how and when to apply"
+        "application": ["Detailed point-wise instructions on how and when to apply"]
       }
     ]
   },
@@ -192,7 +192,9 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                                 <h4 className="font-semibold">{issue.name}</h4>
                                                 <Badge variant={getSeverityVariant(issue.severity)}>{issue.severity}</Badge>
                                             </div>
-                                            <p className="text-sm text-muted-foreground">{issue.description}</p>
+                                            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mt-1">
+                                                {issue.description.map((point, i) => <li key={i}>{point}</li>)}
+                                            </ul>
                                         </div>
                                     </div>
                                 ))}
@@ -213,7 +215,9 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                             {analysis.treatments.natural.map((rec, index) => (
                                                 <div key={index} className="text-sm pl-7">
                                                     <p className="font-semibold">{rec.method}</p>
-                                                    <p className="text-muted-foreground">{rec.details}</p>
+                                                    <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
+                                                        {rec.details.map((point, i) => <li key={i}>{point}</li>)}
+                                                    </ul>
                                                 </div>
                                             ))}
                                         </div>
@@ -226,7 +230,9 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                             {analysis.treatments.chemical.map((rec, index) => (
                                                 <div key={index} className="text-sm pl-7">
                                                     <p className="font-semibold">{rec.pesticideName}</p>
-                                                    <p className="text-muted-foreground">{rec.application}</p>
+                                                    <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
+                                                        {rec.application.map((point, i) => <li key={i}>{point}</li>)}
+                                                    </ul>
                                                 </div>
                                             ))}
                                         </div>

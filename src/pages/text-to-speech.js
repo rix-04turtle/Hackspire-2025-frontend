@@ -33,7 +33,7 @@ const TextToSpeechPage = () => {
 
             try {
                 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-                const API = `${BASE_URL}/api/text-to-speech`
+                const API = `${BASE_URL}/apis/text-to-speech`
 
                 const params = {
                     method: 'POST',
