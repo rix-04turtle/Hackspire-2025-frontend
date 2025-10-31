@@ -1,4 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { 
+    Sun, 
+    Cloud, 
+    CloudDrizzle, 
+    CloudRain, 
+    CloudSnow, 
+    CloudFog, 
+    CloudLightning,
+    Cloudy,
+    CloudSun
+} from 'lucide-react';
 
 // Simple weather component that uses Open-Meteo (no API key) and browser geolocation.
 export default function Weather({ className = '' }) {
@@ -59,19 +70,19 @@ export default function Weather({ className = '' }) {
         };
     }, []);
 
-    function weatherDescription(code) {
-        // Simplified mapping of weather codes from Open-Meteo
-        if (code === 0) return 'Clear';
-        if (code === 1) return 'Mainly clear';
-        if (code === 2) return 'Partly cloudy';
-        if (code === 3) return 'Overcast';
-        if (code >= 45 && code <= 48) return 'Fog';
-        if (code >= 51 && code <= 57) return 'Drizzle';
-        if (code >= 61 && code <= 67) return 'Rain';
-        if (code >= 71 && code <= 77) return 'Snow/Grains';
-        if (code >= 80 && code <= 82) return 'Rain showers';
-        if (code >= 95 && code <= 99) return 'Thunderstorm';
-        return 'Unknown';
+    function getWeatherInfo(code) {
+        // Return both description and icon component for weather codes from Open-Meteo
+        if (code === 0) return { description: 'Clear', icon: Sun, color: 'text-yellow-500' };
+        if (code === 1) return { description: 'Mainly clear', icon: CloudSun, color: 'text-yellow-500' };
+        if (code === 2) return { description: 'Partly cloudy', icon: CloudSun, color: 'text-gray-500' };
+        if (code === 3) return { description: 'Overcast', icon: Cloudy, color: 'text-gray-500' };
+        if (code >= 45 && code <= 48) return { description: 'Fog', icon: CloudFog, color: 'text-gray-400' };
+        if (code >= 51 && code <= 57) return { description: 'Drizzle', icon: CloudDrizzle, color: 'text-blue-400' };
+        if (code >= 61 && code <= 67) return { description: 'Rain', icon: CloudRain, color: 'text-blue-500' };
+        if (code >= 71 && code <= 77) return { description: 'Snow', icon: CloudSnow, color: 'text-blue-200' };
+        if (code >= 80 && code <= 82) return { description: 'Rain showers', icon: CloudRain, color: 'text-blue-600' };
+        if (code >= 95 && code <= 99) return { description: 'Thunderstorm', icon: CloudLightning, color: 'text-yellow-600' };
+        return { description: 'Unknown', icon: Cloud, color: 'text-gray-400' };
     }
 
     return (
@@ -80,9 +91,25 @@ export default function Weather({ className = '' }) {
             <div className="w-full">
                 <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between h-28">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h10a4 4 0 004-4 4 4 0 00-4-4H7a4 4 0 00-4 4z" /></svg>
-                        </div>
+                        {loading ? (
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center animate-pulse">
+                                <Cloud className="w-6 h-6 text-gray-400" />
+                            </div>
+                        ) : error ? (
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <Cloud className="w-6 h-6 text-red-400" />
+                            </div>
+                        ) : weather ? (
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors duration-300 ${getWeatherInfo(weather.weathercode).color.replace('text-', 'bg-').replace('500', '100').replace('600', '100').replace('400', '50')}`}>
+                                {React.createElement(getWeatherInfo(weather.weathercode).icon, {
+                                    className: `w-6 h-6 ${getWeatherInfo(weather.weathercode).color}`
+                                })}
+                            </div>
+                        ) : (
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                <Cloud className="w-6 h-6 text-gray-400" />
+                            </div>
+                        )}
                         <div>
                             <div className="text-sm text-gray-500">Local Weather</div>
                             {loading ? (
@@ -91,8 +118,8 @@ export default function Weather({ className = '' }) {
                                 <div className="text-sm text-red-500">{error}</div>
                             ) : weather ? (
                                 <div className="flex items-baseline gap-3">
-                                    <div className="text-2xl font-bold text-green-800">{Math.round(weather.temp)}°C</div>
-                                    <div className="text-sm text-gray-600">{weatherDescription(weather.weathercode)}</div>
+                                    <div className="text-2xl font-bold text-gray-800">{Math.round(weather.temp)}°C</div>
+                                    <div className="text-sm text-gray-600">{getWeatherInfo(weather.weathercode).description}</div>
                                 </div>
                             ) : (
                                 <div className="text-sm text-gray-600">No data</div>
