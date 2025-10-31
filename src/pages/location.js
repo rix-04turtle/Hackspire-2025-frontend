@@ -123,7 +123,8 @@ const YOUR_API_KEY = process.env.NEXT_PUBLIC_YOUR_API_KEY
     const confirmLocation = () => {
         if (location.state) {
             localStorage.setItem('userState', location.state);
-            router.push('/home');
+            // After confirming location, go to crop list page
+            router.push('/crop-list');
         }
     };
 

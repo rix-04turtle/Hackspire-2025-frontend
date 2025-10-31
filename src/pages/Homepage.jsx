@@ -4,10 +4,12 @@ import { Leaf, Sun, Cloud, Droplets } from 'lucide-react';
 import Weather from '@/components/Weather/Weather';
 import RainProbability from '@/components/Rain/RainProbability';
 import CropDoctor from '@/components/CropDoctor/CropDoctor';
+import BottomNav from '@/components/Navigation/BottomNav';
+import ChatBot from '@/components/ChatBot/ChatBot';
 
 const Homepage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100">
+    <div className="min-h-screen pb-16 bg-gradient-to-b from-green-50 to-green-100">
       {/* Navigation Bar */}
       <nav className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
@@ -53,9 +55,11 @@ const Homepage = () => {
 
       {/* Features grid removed as requested */}
 
-      {/* CTA removed */}
+      {/* Chatbot */}
+      <ChatBot />
 
-      {/* Footer removed per request */}
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 };
