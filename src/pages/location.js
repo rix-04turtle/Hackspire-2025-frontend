@@ -35,9 +35,11 @@ export default function LocationPage() {
             setLocation({ ...location, detecting: true, error: null });
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
+const YOUR_API_KEY = process.env.NEXT_PUBLIC_YOUR_API_KEY
+
                     try {
                         const response = await fetch(
-                            `https://api.opencagedata.com/geocode/v1/json?q=${position.coords.latitude}+${position.coords.longitude}&key=YOUR_API_KEY&language=en`
+                            `https://api.opencagedata.com/geocode/v1/json?q=${position.coords.latitude}+${position.coords.longitude}&key=${YOUR_API_KEY}&language=en`
                         );
                         const data = await response.json();
                         
