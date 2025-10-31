@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import Homepage from '../Homepage'
+import Homepage from './HomePage'
 
 export default function Home() {
   const router = useRouter()
@@ -11,7 +11,7 @@ export default function Home() {
     const guest = localStorage.getItem('guest')
     if (!token && !guest) {
       // If not logged in and not continuing as guest, redirect to login
-      router.replace('/login')
+      // router.replace('/login')
     }
   }, [router])
 

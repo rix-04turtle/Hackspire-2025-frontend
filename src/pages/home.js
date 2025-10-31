@@ -9,7 +9,7 @@ export default function Home() {
     // Check if user is logged in
     const token = localStorage.getItem('token')
     if (!token) {
-      router.replace('/login')
+      // router.replace('/login')
     }
   }, [router])
 
