@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Leaf } from 'lucide-react';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -26,7 +29,8 @@ export default function LanguageSelect() {
       router.push('/login');
     } catch (error) {
       console.error('Error selecting language:', error);
-      // Fallback to English if there's an error
+      setSelectedLang('en');
+      localStorage.setItem('preferredLanguage', 'en');
       router.push('/login');
     }
   };

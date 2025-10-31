@@ -61,8 +61,8 @@ const Bodysignup = ({ className, ...props }) => {
             console.log('Signup response:', data);
 
             if (response.ok) {
-                alert('Account created successfully! Please log in.');
-                router.push('/login');
+                localStorage.setItem('token', data.token); // Assuming backend sends a token
+                router.push('/location');
             } else {
                 setError(data.message || 'Something went wrong');
             }
@@ -187,7 +187,7 @@ const Bodysignup = ({ className, ...props }) => {
                                 } catch (err) {
                                     console.warn('Could not set guest flag in localStorage', err);
                                 }
-                                router.push('/home');
+                                router.push('/location');
                             }}
                         >
                             Continue as guest
