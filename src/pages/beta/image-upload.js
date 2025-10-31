@@ -1,4 +1,4 @@
-import BetaBodyCropDoctor from '@/components/beta/CropDoctor/BodyCropDoctor'
+import BodyCropDoctor from '@/components/beta/CropDoctor/BodyCropDoctor'
 import Head from 'next/head'
 import Link from 'next/link'
 import { Leaf } from 'lucide-react'
@@ -29,7 +29,7 @@ const ImageUpload = () => {
                 </div>
             </nav>
 
-            <BetaBodyCropDoctor />
+            <BodyCropDoctor />
         </>
     )
 }

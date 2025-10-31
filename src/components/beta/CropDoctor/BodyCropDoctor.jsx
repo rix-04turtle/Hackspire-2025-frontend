@@ -6,9 +6,18 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X } from 'lucide-react'
+import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X, ShoppingCart, ExternalLink } from 'lucide-react'
 
-const BetaBodyCropDoctor = () => {
+// Mock marketplace data - Replace with your actual API/data source
+const marketplaceProducts = [
+    {
+        name: "Mancozeb", marketPlaceName: "AgriBegri", link: "https://agribegri.com/products/buy-katyayani-chatur-mancozeb-azoxystrobin-fungicide-online.php",
+        img: "https://dujjhct8zer0r.cloudfront.net/media/prod_image/6282905051728638332.webp", price: 1075
+    },
+    { name: "Mancozeb", marketPlaceName: "Spray Karo", link: "https://www.spraykaro.com/product/hpm-natraj-azoxystrobin-11-5-mancozeb-30-wp-1", img: "https://www.spraykaro.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fstrapi-spraykaro%2Fimage%2Fupload%2Ff_auto%2Cq_auto%2Fv1%2Fspraykaro%2F3093468721737636652_2a6a90ebd1&w=640&q=75", price: 830 },
+]
+
+const BodyCropDoctor = () => {
     const [image, setImage] = useState(null)
     const [preview, setPreview] = useState(null)
     const [analysis, setAnalysis] = useState(null)
@@ -199,325 +208,344 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
     return (
         <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100">
             <div className="container mx-auto p-4 md:p-8">
-                <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold tracking-tight text-green-800 mb-4">Crop Doctor</h1>
+                {/* Header Section */}
+                <div className="text-center mb-8">
+                    <h1 className="text-5xl font-bold tracking-tight text-green-800 mb-3">🌾 Crop Doctor</h1>
                     <p className="text-lg text-green-700 max-w-2xl mx-auto">
-                        Upload an image of your crop and let our AI-powered system diagnose and provide treatment recommendations.
+                        AI-powered crop diagnosis and treatment recommendations
                     </p>
-                    <div className="max-w-xs mx-auto mt-6">
-                        <Select onValueChange={setLanguage} defaultValue={language}>
-                            <SelectTrigger className="bg-white/80 backdrop-blur-sm border-green-200">
-                                <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="English">English</SelectItem>
-                                <SelectItem value="Hindi">Hindi</SelectItem>
-                                <SelectItem value="Bengali">Bengali</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
                 </div>
 
-            <Card className="max-w-2xl mx-auto">
-                <CardContent className="p-6">
-                    <div
-                        className="border-2 border-dashed border-green-300 rounded-xl p-8 text-center cursor-pointer hover:bg-green-50/50 transition-all group relative overflow-hidden"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <div className="relative z-10">
-                            <div className="bg-green-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4">
-                                <Upload className="h-10 w-10 text-green-600 group-hover:scale-110 transition-transform" />
+                {/* Main Card */}
+                <Card className="max-w-4xl mx-auto shadow-xl border-green-200">
+                    <CardContent className="p-8">
+                        {/* Language Selector - Top Right */}
+                        <div className="flex justify-end mb-6">
+                            <div className="w-48">
+                                <label className="text-xs font-medium text-green-700 mb-1.5 block">Language</label>
+                                <Select onValueChange={setLanguage} defaultValue={language}>
+                                    <SelectTrigger className="bg-white border-green-300 focus:ring-green-500">
+                                        <SelectValue placeholder="Select language" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="English">🇬🇧 English</SelectItem>
+                                        <SelectItem value="Hindi">🇮🇳 Hindi</SelectItem>
+                                        <SelectItem value="Bengali">🇧🇩 Bengali</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
-                            <h3 className="text-lg font-semibold text-green-800 mb-2">Upload Your Crop Image</h3>
-                            <p className="text-green-600">Click to upload or drag and drop</p>
-                            <p className="text-sm text-green-500 mt-2">Supports: JPG, PNG</p>
                         </div>
-                        <div className="absolute inset-0 bg-gradient-to-br from-green-100/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <Input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                        />
-                    </div>
 
-                    {preview && (
-                        <div className="mt-6 relative group">
-                            <div className="relative rounded-xl overflow-hidden shadow-lg">
-                                <img src={preview} alt="Preview" className="max-w-full mx-auto" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-green-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setImage(null);
-                                    setPreview(null);
-                                }}
+                        {/* Upload Section */}
+                        {!preview ? (
+                            <div
+                                className="border-2 border-dashed border-green-300 rounded-2xl p-12 text-center cursor-pointer hover:border-green-400 hover:bg-green-50/50 transition-all group relative overflow-hidden"
+                                onClick={() => fileInputRef.current?.click()}
                             >
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    )}
-
-                    <Button
-                        onClick={analyzeImage}
-                        disabled={!image || loading}
-                        className={`w-full mt-6 text-lg font-semibold h-12 ${!image ? 'opacity-50' : 'hover:scale-[1.02]'}`}
-                        size="lg"
-                    >
-                        {loading ? (
-                            <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                Analyzing...
-                            </>
-                        ) : (
-                            <>
-                                <Leaf className="mr-2 h-5 w-5" />
-                                Analyze Crop
-                            </>
-                        )}
-                    </Button>
-                </CardContent>
-            </Card>
-
-            {analysis && !analysis.error && (
-                <div className="max-w-2xl mx-auto mt-8 space-y-6">
-                    <Card className="backdrop-blur-sm bg-white/90 border-green-100 shadow-lg overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent pointer-events-none" />
-                        <CardHeader className="relative">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <CardTitle className="text-2xl text-green-800">{analysis.cropName}</CardTitle>
-                                    <CardDescription className="text-green-600">Confidence: {analysis.confidence}</CardDescription>
+                                <div className="relative z-10">
+                                    <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
+                                        <Upload className="h-12 w-12 text-green-600" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-green-800 mb-2">Upload Your Crop Image</h3>
+                                    <p className="text-green-600 mb-3">Click to browse or drag and drop your image here</p>
+                                    <div className="flex items-center justify-center gap-2 text-sm text-green-500">
+                                        <span className="px-3 py-1 bg-green-100 rounded-full">JPG</span>
+                                        <span className="px-3 py-1 bg-green-100 rounded-full">PNG</span>
+                                        <span className="px-3 py-1 bg-green-100 rounded-full">JPEG</span>
+                                    </div>
                                 </div>
-                                <Button 
-                                    variant="outline" 
-                                    size="icon" 
-                                    className="border-green-200 hover:bg-green-50"
-                                    onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}
+                                <div className="absolute inset-0 bg-gradient-to-br from-green-100/20 via-transparent to-green-200/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <Input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {/* Image Preview */}
+                                <div className="relative group">
+                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-green-200">
+                                        <img src={preview} alt="Preview" className="w-full h-auto max-h-[500px] object-contain bg-gray-50" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-green-900/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                    <Button
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:scale-110"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setImage(null);
+                                            setPreview(null);
+                                            setAnalysis(null);
+                                        }}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+
+                                {/* Analyze Button */}
+                                <Button
+                                    onClick={analyzeImage}
+                                    disabled={!image || loading}
+                                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-lg font-semibold h-14 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                    size="lg"
                                 >
-                                    {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                                            Analyzing Your Crop...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Leaf className="mr-3 h-6 w-6" />
+                                            Analyze Crop Now
+                                        </>
+                                    )}
                                 </Button>
                             </div>
-                        </CardHeader>
-                        <CardContent className="relative">
-                            <Badge 
-                                variant={getHealthStatusVariant(analysis.healthStatus)}
-                                className="text-sm px-4 py-1 font-medium"
-                            >
-                                {analysis.healthStatus}
-                            </Badge>
-                        </CardContent>
-                    </Card>
+                        )}
+                    </CardContent>
+                </Card>
 
-                    {analysis.issues?.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Identified Issues</CardTitle>
+                {/* Analysis Results */}
+                {analysis && !analysis.error && (
+                    <div className="max-w-4xl mx-auto mt-8 space-y-6">
+                        <Card className="backdrop-blur-sm bg-white/90 border-green-100 shadow-lg overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent pointer-events-none" />
+                            <CardHeader className="relative">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <CardTitle className="text-2xl text-green-800">{analysis.cropName}</CardTitle>
+                                        <CardDescription className="text-green-600">Confidence: {analysis.confidence}</CardDescription>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="border-green-200 hover:bg-green-50"
+                                        onClick={() => speakText(`Crop name: ${analysis.cropName}. Health status: ${analysis.healthStatus}. Confidence: ${analysis.confidence}.`)}
+                                    >
+                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                    </Button>
+                                </div>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                {analysis.issues.map((issue, index) => (
-                                    <div key={index} className="flex items-start gap-4">
-                                        <div>{getIssueIcon(issue.type)}</div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center">
-                                                <h4 className="font-semibold">{issue.name}</h4>
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant={getSeverityVariant(issue.severity)}>{issue.severity}</Badge>
-                                                    <Button variant="ghost" size="icon" onClick={() => speakText(`Issue: ${issue.name}. Severity: ${issue.severity}. Description: ${issue.description.join('. ')}.`)}>
-                                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                                                    </Button>
+                            <CardContent className="relative">
+                                <Badge
+                                    variant={getHealthStatusVariant(analysis.healthStatus)}
+                                    className="text-sm px-4 py-1 font-medium"
+                                >
+                                    {analysis.healthStatus}
+                                </Badge>
+                            </CardContent>
+                        </Card>
+
+                        {analysis.issues?.length > 0 && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Identified Issues</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {analysis.issues.map((issue, index) => (
+                                        <div key={index} className="flex items-start gap-4">
+                                            <div>{getIssueIcon(issue.type)}</div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center">
+                                                    <h4 className="font-semibold">{issue.name}</h4>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant={getSeverityVariant(issue.severity)}>{issue.severity}</Badge>
+                                                        <Button variant="ghost" size="icon" onClick={() => speakText(`Issue: ${issue.name}. Severity: ${issue.severity}. Description: ${issue.description.join('. ')}.`)}>
+                                                            {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                                        </Button>
+                                                    </div>
                                                 </div>
+                                                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mt-1">
+                                                    {issue.description.map((point, i) => <li key={i}>{point}</li>)}
+                                                </ul>
                                             </div>
-                                            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 mt-1">
-                                                {issue.description.map((point, i) => <li key={i}>{point}</li>)}
-                                            </ul>
                                         </div>
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
-                    )}
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        )}
 
-                    {analysis.treatments && (analysis.treatments.natural?.length > 0 || analysis.treatments.chemical?.length > 0) && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Treatment Recommendations</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {analysis.treatments.natural?.length > 0 && (
-                                    <div>
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h4 className="font-semibold flex items-center gap-2"><Leaf className="h-5 w-5 text-green-500" /> Natural Remedies</h4>
-                                            <Button variant="ghost" size="icon" onClick={() => speakText(`Natural Remedies. ${analysis.treatments.natural.map(rec => `${rec.method}: ${rec.details.join('. ')}`).join('. ')}`)}>
-                                                {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                                            </Button>
+                        {analysis.treatments && (analysis.treatments.natural?.length > 0 || analysis.treatments.chemical?.length > 0) && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Treatment Recommendations</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {analysis.treatments.natural?.length > 0 && (
+                                        <div>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-semibold flex items-center gap-2"><Leaf className="h-5 w-5 text-green-500" /> Natural Remedies</h4>
+                                                <Button variant="ghost" size="icon" onClick={() => speakText(`Natural Remedies. ${analysis.treatments.natural.map(rec => `${rec.method}: ${rec.details.join('. ')}`).join('. ')}`)}>
+                                                    {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                                </Button>
+                                            </div>
+                                            <div className="space-y-3">
+                                                {analysis.treatments.natural.map((rec, index) => (
+                                                    <div key={index} className="text-sm pl-7">
+                                                        <p className="font-semibold">{rec.method}</p>
+                                                        <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
+                                                            {rec.details.map((point, i) => <li key={i}>{point}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="space-y-3">
-                                            {analysis.treatments.natural.map((rec, index) => (
-                                                <div key={index} className="text-sm pl-7">
-                                                    <p className="font-semibold">{rec.method}</p>
-                                                    <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
-                                                        {rec.details.map((point, i) => <li key={i}>{point}</li>)}
-                                                    </ul>
-                                                </div>
-                                            ))}
+                                    )}
+                                    {analysis.treatments.chemical?.length > 0 && (
+                                        <div>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-semibold flex items-center gap-2"><FlaskConical className="h-5 w-5 text-orange-500" /> Chemical Treatments</h4>
+                                                <Button variant="ghost" size="icon" onClick={() => speakText(`Chemical Treatments. ${analysis.treatments.chemical.map(rec => `${rec.pesticideName}: ${rec.application.join('. ')}`).join('. ')}`)}>
+                                                    {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                                </Button>
+                                            </div>
+                                            <div className="space-y-3">
+                                                {analysis.treatments.chemical.map((rec, index) => (
+                                                    <div key={index} className="text-sm pl-7">
+                                                        <p className="font-semibold">{rec.pesticideName}</p>
+                                                        <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
+                                                            {rec.application.map((point, i) => <li key={i}>{point}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                                {analysis.treatments.chemical?.length > 0 && (
-                                    <div>
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h4 className="font-semibold flex items-center gap-2"><FlaskConical className="h-5 w-5 text-orange-500" /> Chemical Treatments</h4>
-                                            <Button variant="ghost" size="icon" onClick={() => speakText(`Chemical Treatments. ${analysis.treatments.chemical.map(rec => `${rec.pesticideName}: ${rec.application.join('. ')}`).join('. ')}`)}>
-                                                {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                                            </Button>
-                                        </div>
-                                        <div className="space-y-3">
-                                            {analysis.treatments.chemical.map((rec, index) => (
-                                                <div key={index} className="text-sm pl-7">
-                                                    <p className="font-semibold">{rec.pesticideName}</p>
-                                                    <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
-                                                        {rec.application.map((point, i) => <li key={i}>{point}</li>)}
-                                                    </ul>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
 
-                    {analysis.treatments?.chemicalPesticideNames?.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <ShoppingCart className="h-5 w-5" />
-                                    Buy Chemical Products
-                                </CardTitle>
-                                <CardDescription>Purchase recommended pesticides and fertilizers online</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-6">
-                                    {analysis.treatments.chemicalPesticideNames.map((pesticideName, index) => {
-                                        const products = findMarketplaceProducts(pesticideName)
+                        {analysis.treatments?.chemicalPesticideNames?.length > 0 && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <ShoppingCart className="h-5 w-5" />
+                                        Buy Chemical Products
+                                    </CardTitle>
+                                    <CardDescription>Purchase recommended pesticides and fertilizers online</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-6">
+                                        {analysis.treatments.chemicalPesticideNames.map((pesticideName, index) => {
+                                            const products = findMarketplaceProducts(pesticideName)
 
-                                        // Only render if products are found
-                                        if (products.length === 0) return null
+                                            // Only render if products are found
+                                            if (products.length === 0) return null
 
-                                        return (
-                                            <div key={index} className="border-b pb-6 last:border-b-0 last:pb-0">
-                                                <h5 className="font-semibold text-lg mb-4 text-gray-800">{pesticideName}</h5>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {products.map((product, pIndex) => (
-                                                        <div key={pIndex} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white">
-                                                            {/* Product Image */}
-                                                            <div className="relative bg-gray-100 h-48 flex items-center justify-center">
-                                                                <img 
-                                                                    src={product.img} 
-                                                                    alt={product.name}
-                                                                    className="max-h-full max-w-full object-contain p-4"
-                                                                />
-                                                                {/* Marketplace Badge */}
-                                                                <Badge className="absolute top-2 right-2 bg-blue-600">
-                                                                    {product.marketPlaceName}
-                                                                </Badge>
-                                                            </div>
-                                                            
-                                                            {/* Product Details */}
-                                                            <div className="p-4">
-                                                                <h6 className="font-semibold text-sm text-gray-800 mb-2 line-clamp-2">
-                                                                    {product.name}
-                                                                </h6>
-                                                                
-                                                                {/* Price Section */}
-                                                                <div className="flex items-baseline gap-2 mb-3">
-                                                                    <span className="text-2xl font-bold text-gray-900">
-                                                                        ₹{product.price.toLocaleString('en-IN')}
-                                                                    </span>
-                                                                    <span className="text-sm text-gray-500">
-                                                                        Inclusive of all taxes
-                                                                    </span>
+                                            return (
+                                                <div key={index} className="border-b pb-6 last:border-b-0 last:pb-0">
+                                                    <h5 className="font-semibold text-lg mb-4 text-gray-800">{pesticideName}</h5>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {products.map((product, pIndex) => (
+                                                            <div key={pIndex} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white">
+                                                                {/* Product Image */}
+                                                                <div className="relative bg-gray-100 h-48 flex items-center justify-center">
+                                                                    <img
+                                                                        src={product.img}
+                                                                        alt={product.name}
+                                                                        className="max-h-full max-w-full object-contain p-4"
+                                                                    />
+                                                                    {/* Marketplace Badge */}
+                                                                    <Badge className="absolute top-2 right-2 bg-blue-600">
+                                                                        {product.marketPlaceName}
+                                                                    </Badge>
                                                                 </div>
 
-                                                                {/* Buy Button */}
-                                                                <a
-                                                                    href={product.link}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="block w-full"
-                                                                >
-                                                                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
-                                                                        <ShoppingCart className="h-4 w-4 mr-2" />
-                                                                        Buy Now
-                                                                        <ExternalLink className="h-3 w-3 ml-2" />
-                                                                    </Button>
-                                                                </a>
+                                                                {/* Product Details */}
+                                                                <div className="p-4">
+                                                                    <h6 className="font-semibold text-sm text-gray-800 mb-2 line-clamp-2">
+                                                                        {product.name}
+                                                                    </h6>
+
+                                                                    {/* Price Section */}
+                                                                    <div className="flex items-baseline gap-2 mb-3">
+                                                                        <span className="text-2xl font-bold text-gray-900">
+                                                                            ₹{product.price.toLocaleString('en-IN')}
+                                                                        </span>
+                                                                        <span className="text-sm text-gray-500">
+                                                                            Inclusive of all taxes
+                                                                        </span>
+                                                                    </div>
+
+                                                                    {/* Buy Button */}
+                                                                    <a
+                                                                        href={product.link}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="block w-full"
+                                                                    >
+                                                                        <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                                                                            <ShoppingCart className="h-4 w-4 mr-2" />
+                                                                            Buy Now
+                                                                            <ExternalLink className="h-3 w-3 ml-2" />
+                                                                        </Button>
+                                                                    </a>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
+                                            )
+                                        })}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                    {analysis.preventiveMeasures?.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <div className="flex justify-between items-center">
-                                    <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Preventive Measures</CardTitle>
-                                    <Button variant="ghost" size="icon" onClick={() => speakText(`Preventive Measures. ${analysis.preventiveMeasures.join('. ')}`)}>
-                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                                    {analysis.preventiveMeasures.map((measure, index) => (
-                                        <li key={index}>{measure}</li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-                    )}
+                        {analysis.preventiveMeasures?.length > 0 && (
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex justify-between items-center">
+                                        <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Preventive Measures</CardTitle>
+                                        <Button variant="ghost" size="icon" onClick={() => speakText(`Preventive Measures. ${analysis.preventiveMeasures.join('. ')}`)}>
+                                            {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                        </Button>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                                        {analysis.preventiveMeasures.map((measure, index) => (
+                                            <li key={index}>{measure}</li>
+                                        ))}
+                                    </ul>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                    {analysis.estimatedRecoveryTime && (
-                        <Card>
-                            <CardHeader>
-                                <div className="flex justify-between items-center">
-                                    <CardTitle className="flex items-center gap-2"><Clock className="h-5 w-5" /> Estimated Recovery Time</CardTitle>
-                                    <Button variant="ghost" size="icon" onClick={() => speakText(`Estimated Recovery Time: ${analysis.estimatedRecoveryTime}`)}>
-                                        {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-lg font-medium">{analysis.estimatedRecoveryTime}</p>
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
-            )}
+                        {analysis.estimatedRecoveryTime && (
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex justify-between items-center">
+                                        <CardTitle className="flex items-center gap-2"><Clock className="h-5 w-5" /> Estimated Recovery Time</CardTitle>
+                                        <Button variant="ghost" size="icon" onClick={() => speakText(`Estimated Recovery Time: ${analysis.estimatedRecoveryTime}`)}>
+                                            {isSpeaking ? <StopCircle className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                        </Button>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-lg font-medium">{analysis.estimatedRecoveryTime}</p>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                )}
 
-            {analysis && analysis.error && (
-                <Alert variant="destructive" className="max-w-2xl mx-auto mt-8">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Analysis Error</AlertTitle>
-                    <AlertDescription>{analysis.error}</AlertDescription>
-                </Alert>
-            )}
+                {/* Error Display */}
+                {analysis && analysis.error && (
+                    <Alert variant="destructive" className="max-w-4xl mx-auto mt-8 border-red-300">
+                        <AlertTriangle className="h-5 w-5" />
+                        <AlertTitle className="text-lg font-semibold">Analysis Error</AlertTitle>
+                        <AlertDescription className="text-base">{analysis.error}</AlertDescription>
+                    </Alert>
+                )}
             </div>
         </div>
     );
 };
 
-export default BetaBodyCropDoctor;
+export default BodyCropDoctor;
