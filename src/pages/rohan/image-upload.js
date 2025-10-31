@@ -1,4 +1,4 @@
-import BetaBodyCropDoctor from '@/components/beta/CropDoctor/BodyCropDoctor'
+import OldBodyCropDoctor from '@/components/Rohan/OldCropDoctor'
 import Head from 'next/head'
 
 const ImageUpload = () => {
@@ -10,7 +10,7 @@ const ImageUpload = () => {
                 <title>Crop Doctor | Gemini</title>
             </Head>
 
-            <BetaBodyCropDoctor />
+            <OldBodyCropDoctor />
         </>
     )
 }

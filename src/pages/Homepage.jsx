@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Leaf, Sun, Cloud, Droplets } from 'lucide-react';
+import Weather from '../components/Weather';
 
 const Homepage = () => {
   return (
@@ -55,7 +56,7 @@ const Homepage = () => {
               <Cloud className="h-6 w-6 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold text-green-900 mb-2">Weather Integration</h3>
-            <p className="text-green-700">Real-time weather updates and predictions to protect your crops.</p>
+            <Weather />
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">

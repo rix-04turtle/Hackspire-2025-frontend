@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle } from 'lucide-react'
 
-const BetaBodyCropDoctor = () => {
+const OldBodyCropDoctor = () => {
     const [image, setImage] = useState(null)
     const [preview, setPreview] = useState(null)
     const [analysis, setAnalysis] = useState(null)
@@ -389,4 +389,4 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
     )
 }
 
-export default BetaBodyCropDoctor
+export default OldBodyCropDoctor
