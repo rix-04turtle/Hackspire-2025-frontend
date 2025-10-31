@@ -8,6 +8,7 @@ const IndexPage = () => {
         { name: "Signup", path: "/signup" },
         { name: "Crops", path: "/crops" },
         { name: "Indian States", path: "/indian-states" },
+        { name: "Text to Speech", path: "/text-to-speech" },
     ]
 
     return (
