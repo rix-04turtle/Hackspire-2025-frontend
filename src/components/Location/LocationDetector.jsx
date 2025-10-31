@@ -17,7 +17,7 @@ const indianStates = [
     "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
 ];
 
-export default function LocationDetector() {
+export default function LocationDetector({ onStateChange } = {}) {
     const [location, setLocation] = useState({
         detecting: true,
         state: '',
@@ -82,11 +82,19 @@ export default function LocationDetector() {
             state: event.target.value,
             error: null
         });
+        if (typeof onStateChange === 'function') onStateChange(event.target.value);
     };
 
     const handleManualSelect = () => {
         setShowStateSelect(true);
     };
+
+    // notify parent when location.state changes (e.g., from reverse geocode)
+    useEffect(() => {
+        if (location.state && typeof onStateChange === 'function') {
+            onStateChange(location.state);
+        }
+    }, [location.state]);
 
     return (
         <Card className="p-6">

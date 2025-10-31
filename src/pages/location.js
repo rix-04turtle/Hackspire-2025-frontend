@@ -121,7 +121,8 @@ export default function LocationPage() {
     const confirmLocation = () => {
         if (location.state) {
             localStorage.setItem('userState', location.state);
-            router.push('/home');
+            // After confirming location, go to crop list page
+            router.push('/crop-list');
         }
     };
 
