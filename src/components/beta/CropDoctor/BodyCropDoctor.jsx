@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X, ShoppingCart, ExternalLink, MessageCircle } from 'lucide-react'
+import { Loader2, Upload, Leaf, FlaskConical, ShieldCheck, Clock, AlertTriangle, Bug, TestTube, Volume2, StopCircle, X, ShoppingCart, ExternalLink, MessageCircle, Camera, ImageIcon, RefreshCw } from 'lucide-react'
 
 // Mock marketplace data - Replace with your actual API/data source
 const marketplaceProducts = [
@@ -27,7 +27,13 @@ const BodyCropDoctor = () => {
     const [language, setLanguage] = useState('English')
     const [isSpeaking, setIsSpeaking] = useState(false)
     const [currentAudio, setCurrentAudio] = useState(null)
+    const [captureMode, setCaptureMode] = useState('upload') // 'upload' or 'camera'
+    const [isCameraActive, setIsCameraActive] = useState(false)
+    const [stream, setStream] = useState(null)
+    const [facingMode, setFacingMode] = useState('environment') // 'environment' (back) or 'user' (front)
     const fileInputRef = useRef(null)
+    const videoRef = useRef(null)
+    const canvasRef = useRef(null)
     const resultsRef = useRef(null)
 
     // Function to find all matching products from marketplace
@@ -97,6 +103,84 @@ const BodyCropDoctor = () => {
         }
     }
 
+    const startCamera = async () => {
+        // Stop any existing stream first
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { 
+                    facingMode: facingMode,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+            setStream(mediaStream);
+            
+            // Wait for next tick to ensure ref is available
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.srcObject = mediaStream;
+                }
+            }, 0);
+            
+            setIsCameraActive(true);
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            alert('Could not access camera. Please ensure you have granted camera permissions.');
+            setIsCameraActive(false);
+        }
+    }
+
+    const stopCamera = () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+            setStream(null);
+        }
+        setIsCameraActive(false);
+    }
+
+    const switchCamera = () => {
+        // Toggle facing mode - this will trigger the useEffect
+        setFacingMode(prevMode => (prevMode === 'environment' ? 'user' : 'environment'));
+    }
+
+    const capturePhoto = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            
+            // Check if video is actually playing
+            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+                alert('Camera not ready. Please wait a moment and try again.');
+                return;
+            }
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    console.error('Canvas to Blob conversion failed');
+                    alert('Could not capture photo. Please try again.');
+                    return;
+                }
+                const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+                setImage(file);
+                setPreview(URL.createObjectURL(blob));
+                setAnalysis(null);
+                stopCamera();
+            }, 'image/jpeg', 0.95);
+        }
+    }
+
     const handleImageUpload = (e) => {
         const file = e.target.files[0]
         if (file) {
@@ -105,6 +189,29 @@ const BodyCropDoctor = () => {
             setAnalysis(null)
         }
     }
+
+    const handleModeChange = (mode) => {
+        setCaptureMode(mode)
+        if (mode === 'camera' && !isCameraActive && !preview) {
+            startCamera()
+        } else if (mode === 'upload' && isCameraActive) {
+            stopCamera()
+        }
+    }
+
+    // Cleanup camera on unmount
+    React.useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, []);
+
+    // Effect to restart camera when facing mode changes
+    React.useEffect(() => {
+        if (isCameraActive) {
+            startCamera();
+        }
+    }, [facingMode]);
 
     const analyzeImage = async () => {
         if (!image) return
@@ -229,6 +336,30 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     <p className="text-lg text-green-700 max-w-2xl mx-auto">
                         AI-powered crop diagnosis and treatment recommendations
                     </p>
+                    
+                    {/* New Live Mode Banner */}
+                    <div className="mt-6 max-w-2xl mx-auto">
+                        <Alert className="bg-linear-to-r from-blue-50 to-cyan-50 border-blue-200">
+                            <AlertDescription className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <MessageCircle className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-semibold text-blue-900">Try Live Crop Doctor!</p>
+                                        <p className="text-sm text-blue-700">Real-time video analysis with Gemini Live API</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={() => router.push('/live-crop-doctor')}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    size="sm"
+                                >
+                                    Try Live Mode
+                                </Button>
+                            </AlertDescription>
+                        </Alert>
+                    </div>
                 </div>
 
                 {/* Main Card */}
@@ -251,8 +382,30 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                             </div>
                         </div>
 
+                        {/* Mode Selector - Upload vs Camera */}
+                        {!preview && (
+                            <div className="flex gap-3 mb-6">
+                                <Button
+                                    variant={captureMode === 'upload' ? 'default' : 'outline'}
+                                    className={`flex-1 h-12 ${captureMode === 'upload' ? 'bg-green-600 hover:bg-green-700' : 'border-green-300 hover:bg-green-50'}`}
+                                    onClick={() => handleModeChange('upload')}
+                                >
+                                    <ImageIcon className="h-5 w-5 mr-2" />
+                                    Upload Image
+                                </Button>
+                                <Button
+                                    variant={captureMode === 'camera' ? 'default' : 'outline'}
+                                    className={`flex-1 h-12 ${captureMode === 'camera' ? 'bg-green-600 hover:bg-green-700' : 'border-green-300 hover:bg-green-50'}`}
+                                    onClick={() => handleModeChange('camera')}
+                                >
+                                    <Camera className="h-5 w-5 mr-2" />
+                                    Capture Photo
+                                </Button>
+                            </div>
+                        )}
+
                         {/* Upload Section */}
-                        {!preview ? (
+                        {!preview && captureMode === 'upload' && (
                             <div
                                 className="border-2 border-dashed border-green-300 rounded-2xl p-12 text-center cursor-pointer hover:border-green-400 hover:bg-green-50/50 transition-all group relative overflow-hidden"
                                 onClick={() => fileInputRef.current?.click()}
@@ -278,7 +431,73 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                     className="hidden"
                                 />
                             </div>
-                        ) : (
+                        )}
+
+                        {/* Camera Section */}
+                        {!preview && captureMode === 'camera' && (
+                            <div className="border-2 border-green-300 rounded-2xl overflow-hidden bg-black relative">
+                                {isCameraActive ? (
+                                    <>
+                                        <video
+                                            ref={videoRef}
+                                            autoPlay
+                                            playsInline
+                                            className="w-full h-auto max-h-[500px] object-contain"
+                                        />
+                                        {/* Camera Switch Button - Top Right */}
+                                        <Button
+                                            onClick={switchCamera}
+                                            variant="secondary"
+                                            size="icon"
+                                            className="absolute top-4 right-4 rounded-full bg-white/90 hover:bg-white shadow-lg backdrop-blur-sm z-10"
+                                        >
+                                            <RefreshCw className="h-5 w-5 text-green-700" />
+                                        </Button>
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                                            <div className="flex justify-center gap-4">
+                                                <Button
+                                                    onClick={capturePhoto}
+                                                    className="bg-green-600 hover:bg-green-700 text-white h-14 px-8 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                                                    size="lg"
+                                                >
+                                                    <Camera className="h-5 w-5 mr-2" />
+                                                    Capture Photo
+                                                </Button>
+                                                <Button
+                                                    onClick={stopCamera}
+                                                    variant="destructive"
+                                                    className="h-14 px-6 rounded-full shadow-lg"
+                                                    size="lg"
+                                                >
+                                                    <X className="h-5 w-5 mr-2" />
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="p-12 text-center">
+                                        <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-6 shadow-lg">
+                                            <Camera className="h-12 w-12 text-green-600" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-green-800 mb-2">Camera Ready</h3>
+                                        <p className="text-green-600 mb-6">Click below to start your camera</p>
+                                        <Button
+                                            onClick={startCamera}
+                                            className="bg-green-600 hover:bg-green-700 text-white h-12 px-8"
+                                            size="lg"
+                                        >
+                                            <Camera className="h-5 w-5 mr-2" />
+                                            Start Camera
+                                        </Button>
+                                    </div>
+                                )}
+                                <canvas ref={canvasRef} className="hidden" />
+                            </div>
+                        )}
+
+                        {/* Image Preview Section */}
+                        {preview && (
                             <div className="space-y-4">
                                 {/* Image Preview */}
                                 <div className="relative group">
