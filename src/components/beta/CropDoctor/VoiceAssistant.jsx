@@ -272,8 +272,54 @@ Confidence: ${initialAnalysis.confidence}`
             setIsPlaying(true)
             setStatusMessage('Playing response...')
 
-            // Convert base64 to blob
-            const audioBlob = await fetch(`data:${mimeType || 'audio/wav'};base64,${audioData}`).then(r => r.blob())
+            // Gemini returns raw PCM audio data in base64
+            // We need to convert it to a playable format
+            
+            // Decode base64 to binary
+            const binaryString = atob(audioData)
+            const bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i)
+            }
+
+            // Create a WAV file header (PCM, 24kHz, 16-bit, mono)
+            const sampleRate = 24000
+            const numChannels = 1
+            const bitsPerSample = 16
+            const byteRate = sampleRate * numChannels * bitsPerSample / 8
+            const blockAlign = numChannels * bitsPerSample / 8
+            const dataSize = bytes.length
+
+            // WAV header
+            const wavHeader = new Uint8Array(44)
+            const view = new DataView(wavHeader.buffer)
+
+            // "RIFF" chunk descriptor
+            view.setUint32(0, 0x52494646, false) // "RIFF"
+            view.setUint32(4, 36 + dataSize, true) // file size - 8
+            view.setUint32(8, 0x57415645, false) // "WAVE"
+
+            // "fmt " sub-chunk
+            view.setUint32(12, 0x666d7420, false) // "fmt "
+            view.setUint32(16, 16, true) // subchunk size
+            view.setUint16(20, 1, true) // audio format (1 = PCM)
+            view.setUint16(22, numChannels, true) // number of channels
+            view.setUint32(24, sampleRate, true) // sample rate
+            view.setUint32(28, byteRate, true) // byte rate
+            view.setUint16(32, blockAlign, true) // block align
+            view.setUint16(34, bitsPerSample, true) // bits per sample
+
+            // "data" sub-chunk
+            view.setUint32(36, 0x64617461, false) // "data"
+            view.setUint32(40, dataSize, true) // data size
+
+            // Combine header and audio data
+            const wavFile = new Uint8Array(44 + dataSize)
+            wavFile.set(wavHeader, 0)
+            wavFile.set(bytes, 44)
+
+            // Create blob and URL
+            const audioBlob = new Blob([wavFile], { type: 'audio/wav' })
             const audioUrl = URL.createObjectURL(audioBlob)
 
             // Play audio
@@ -286,7 +332,8 @@ Confidence: ${initialAnalysis.confidence}`
                 setStatusMessage('Tap microphone to ask another question')
             }
 
-            audio.onerror = () => {
+            audio.onerror = (e) => {
+                console.error('Audio playback error:', e)
                 URL.revokeObjectURL(audioUrl)
                 setIsPlaying(false)
                 setError('Error playing audio response')
