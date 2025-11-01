@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
+import Script from 'next/script'
 
 const IndexPage = () => {
     const ROUTES = [
@@ -33,6 +34,7 @@ const IndexPage = () => {
                     </li>
                 ))}
             </ul>
+            
         </div>
     )
 }

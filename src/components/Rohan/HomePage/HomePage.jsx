@@ -10,7 +10,7 @@ import Script from 'next/script';
 
 const Homepage = () => {
   return (
-    <div 
+    <div
       className="min-h-screen pb-16 relative"
       style={{
         backgroundImage: 'url("https://i.pinimg.com/originals/ef/0b/27/ef0b27eebc4ed0cce9617771c9256155.jpg")',
@@ -21,7 +21,7 @@ const Homepage = () => {
     >
       {/* Overlay for better readability */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-      
+
       {/* Content wrapper */}
       <div className="relative z-10">
         {/* Navigation Bar */}
@@ -47,8 +47,8 @@ const Homepage = () => {
               </span>
             </Link>
             <div className="space-x-4 flex items-center">
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="relative hover:text-green-200 transition-all duration-500 hover:scale-105 
                   text-green-100 group"
               >
@@ -57,8 +57,8 @@ const Homepage = () => {
                   via-green-200 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform 
                   duration-500 ease-out"></span>
               </Link>
-              <Link 
-                href="/signup" 
+              <Link
+                href="/signup"
                 className="relative bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 
                   hover:to-green-700 px-6 py-2.5 rounded-lg transition-all duration-500 ease-out 
                   hover:scale-[1.02] shadow-md hover:shadow-lg hover:shadow-green-500/25
@@ -75,7 +75,7 @@ const Homepage = () => {
           {/* Weather and Rain Probability Section */}
           <section className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-              <div 
+              <div
                 className="group bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-md rounded-2xl 
                   shadow-xl p-6 transform transition-all duration-500 ease-out hover:shadow-2xl 
                   hover:shadow-green-500/10 hover:scale-[1.01] motion-safe:hover:-translate-y-0.5
@@ -90,7 +90,7 @@ const Homepage = () => {
                 </div>
               </div>
 
-              <div 
+              <div
                 className="group bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-md rounded-2xl 
                   shadow-xl p-6 transform transition-all duration-500 ease-out hover:shadow-2xl 
                   hover:shadow-blue-500/10 hover:scale-[1.01] motion-safe:hover:-translate-y-0.5
@@ -143,8 +143,8 @@ const Homepage = () => {
         {/* Bottom Navigation */}
         <BottomNav />
       </div>
-      <elevenlabs-convai agent-id="agent_3501k8xn1jg6fsk8j9abme625s3e"></elevenlabs-convai>
-      <Script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></Script>
+      <elevenlabs-convai agent-id="agent_3801k8yhrvbff4pa4tmh4f4r9j17"></elevenlabs-convai>
+      <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
     </div>
   );
 };
