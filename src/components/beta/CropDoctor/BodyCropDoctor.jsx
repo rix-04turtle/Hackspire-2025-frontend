@@ -338,7 +338,7 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                     </p>
                     
                     {/* New Live Mode Banner */}
-                    <div className="mt-6 max-w-2xl mx-auto">
+                    {/* <div className="mt-6 max-w-2xl mx-auto">
                         <Alert className="bg-linear-to-r from-blue-50 to-cyan-50 border-blue-200">
                             <AlertDescription className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -359,7 +359,8 @@ Provide accurate and detailed analysis. If the image is not a crop/plant, indica
                                 </Button>
                             </AlertDescription>
                         </Alert>
-                    </div>
+                    </div> */}
+
                 </div>
 
                 {/* Main Card */}
