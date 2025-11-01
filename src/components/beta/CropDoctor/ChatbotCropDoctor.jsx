@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
-import { Loader2, Send, ArrowLeft, Leaf, Bot, User, Volume2, StopCircle, AlertTriangle, Sparkles } from 'lucide-react'
+import { Loader2, Send, ArrowLeft, Leaf, Bot, User, Volume2, StopCircle, AlertTriangle, Sparkles, Mic } from 'lucide-react'
 import MarkdownMessage from './MarkdownMessage'
 
 const ChatbotCropDoctor = () => {
@@ -230,14 +230,25 @@ Previous crop analysis context is available in the conversation history.`
             <div className="container mx-auto p-4 md:p-8 max-w-5xl">
                 {/* Header */}
                 <div className="mb-6">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.back()}
-                        className="mb-4 text-green-700 hover:text-green-800 hover:bg-green-100"
-                    >
-                        <ArrowLeft className="h-5 w-5 mr-2" />
-                        Back to Analysis
-                    </Button>
+                    <div className="flex justify-between items-center mb-4">
+                        <Button
+                            variant="ghost"
+                            onClick={() => router.back()}
+                            className="text-green-700 hover:text-green-800 hover:bg-green-100"
+                        >
+                            <ArrowLeft className="h-5 w-5 mr-2" />
+                            Back to Analysis
+                        </Button>
+                        
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push('/beta/crop-voice-assistant')}
+                            className="text-green-700 border-green-300 hover:bg-green-50"
+                        >
+                            <Mic className="h-5 w-5 mr-2" />
+                            Switch to Voice Mode
+                        </Button>
+                    </div>
                     
                     <Card className="bg-white border-green-200 shadow-lg">
                         <CardHeader>
@@ -281,7 +292,7 @@ Previous crop analysis context is available in the conversation history.`
                                     className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                 >
                                     {message.role === 'assistant' && (
-                                        <div className="bg-green-600 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                                        <div className="bg-green-600 rounded-full p-2 h-10 w-10 flex items-center justify-center shrink-0">
                                             <Bot className="h-5 w-5 text-white" />
                                         </div>
                                     )}
@@ -329,7 +340,7 @@ Previous crop analysis context is available in the conversation history.`
                                     </div>
 
                                     {message.role === 'user' && (
-                                        <div className="bg-green-600 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0">
+                                        <div className="bg-green-600 rounded-full p-2 h-10 w-10 flex items-center justify-center shrink-0">
                                             <User className="h-5 w-5 text-white" />
                                         </div>
                                     )}
