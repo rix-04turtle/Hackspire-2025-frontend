@@ -8,16 +8,18 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
     Loader2, 
     ArrowLeft, 
-    Leaf, 
-    Mic, 
-    MicOff, 
-    Volume2, 
-    VolumeX, 
     Radio,
     AlertCircle,
     Info,
+    Mic,
+    MicOff,
     MessageSquare
 } from 'lucide-react'
+
+import { base64ToUint8Array, createWavFile } from './helpers/audioHelpers'
+import CropInfoCard from './ui/CropInfoCard'
+import ExampleQuestionsCard from './ui/ExampleQuestionsCard'
+import StatusDisplay from './ui/StatusDisplay'
 
 const VoiceAssistant = () => {
     const router = useRouter()
@@ -271,67 +273,18 @@ Confidence: ${initialAnalysis.confidence}`
         try {
             setIsPlaying(true)
             setStatusMessage('Playing response...')
-
-            // Gemini returns raw PCM audio data in base64
-            // We need to convert it to a playable format
-            
-            // Decode base64 to binary
-            const binaryString = atob(audioData)
-            const bytes = new Uint8Array(binaryString.length)
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i)
-            }
-
-            // Create a WAV file header (PCM, 24kHz, 16-bit, mono)
-            const sampleRate = 24000
-            const numChannels = 1
-            const bitsPerSample = 16
-            const byteRate = sampleRate * numChannels * bitsPerSample / 8
-            const blockAlign = numChannels * bitsPerSample / 8
-            const dataSize = bytes.length
-
-            // WAV header
-            const wavHeader = new Uint8Array(44)
-            const view = new DataView(wavHeader.buffer)
-
-            // "RIFF" chunk descriptor
-            view.setUint32(0, 0x52494646, false) // "RIFF"
-            view.setUint32(4, 36 + dataSize, true) // file size - 8
-            view.setUint32(8, 0x57415645, false) // "WAVE"
-
-            // "fmt " sub-chunk
-            view.setUint32(12, 0x666d7420, false) // "fmt "
-            view.setUint32(16, 16, true) // subchunk size
-            view.setUint16(20, 1, true) // audio format (1 = PCM)
-            view.setUint16(22, numChannels, true) // number of channels
-            view.setUint32(24, sampleRate, true) // sample rate
-            view.setUint32(28, byteRate, true) // byte rate
-            view.setUint16(32, blockAlign, true) // block align
-            view.setUint16(34, bitsPerSample, true) // bits per sample
-
-            // "data" sub-chunk
-            view.setUint32(36, 0x64617461, false) // "data"
-            view.setUint32(40, dataSize, true) // data size
-
-            // Combine header and audio data
-            const wavFile = new Uint8Array(44 + dataSize)
-            wavFile.set(wavHeader, 0)
-            wavFile.set(bytes, 44)
-
-            // Create blob and URL
+            // Use helper functions
+            const bytes = base64ToUint8Array(audioData)
+            const wavFile = createWavFile(bytes)
             const audioBlob = new Blob([wavFile], { type: 'audio/wav' })
             const audioUrl = URL.createObjectURL(audioBlob)
-
-            // Play audio
             const audio = new Audio(audioUrl)
             audioPlayerRef.current = audio
-
             audio.onended = () => {
                 URL.revokeObjectURL(audioUrl)
                 setIsPlaying(false)
                 setStatusMessage('Tap microphone to ask another question')
             }
-
             audio.onerror = (e) => {
                 console.error('Audio playback error:', e)
                 URL.revokeObjectURL(audioUrl)
@@ -339,9 +292,7 @@ Confidence: ${initialAnalysis.confidence}`
                 setError('Error playing audio response')
                 setStatusMessage('Could not play audio')
             }
-
             await audio.play()
-
         } catch (err) {
             console.error('Error playing audio:', err)
             setIsPlaying(false)
@@ -426,29 +377,13 @@ Confidence: ${initialAnalysis.confidence}`
                 <Card className="shadow-2xl border-green-200 mb-6">
                     <CardContent className="p-8">
                         {/* Status Display */}
-                        <div className="text-center mb-8">
-                            <div className="flex items-center justify-center gap-2 mb-2">
-                                {isRecording && (
-                                    <div className="flex gap-1">
-                                        <div className="w-1 h-8 bg-red-500 rounded animate-pulse" style={{ animationDelay: '0ms' }}></div>
-                                        <div className="w-1 h-8 bg-red-500 rounded animate-pulse" style={{ animationDelay: '150ms' }}></div>
-                                        <div className="w-1 h-8 bg-red-500 rounded animate-pulse" style={{ animationDelay: '300ms' }}></div>
-                                    </div>
-                                )}
-                                {isProcessing && <Loader2 className="h-6 w-6 animate-spin text-green-600" />}
-                                {isPlaying && <Volume2 className="h-6 w-6 text-green-600 animate-pulse" />}
-                            </div>
-                            
-                            <p className="text-lg font-medium text-gray-800 mb-1">
-                                {statusMessage}
-                            </p>
-                            
-                            {conversationHistory.length > 0 && (
-                                <p className="text-sm text-gray-500">
-                                    {conversationHistory.length / 2} questions asked
-                                </p>
-                            )}
-                        </div>
+                        <StatusDisplay
+                            isRecording={isRecording}
+                            isProcessing={isProcessing}
+                            isPlaying={isPlaying}
+                            statusMessage={statusMessage}
+                            conversationHistory={conversationHistory}
+                        />
 
                         {/* Error Display */}
                         {error && (
@@ -505,50 +440,10 @@ Confidence: ${initialAnalysis.confidence}`
                 </Card>
 
                 {/* Crop Info Card */}
-                <Card className="border-green-200 bg-white">
-                    <CardHeader>
-                        <CardTitle className="text-lg text-green-800 flex items-center gap-2">
-                            <Leaf className="h-5 w-5" />
-                            Current Crop Analysis
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p className="text-gray-600 font-medium">Crop Type</p>
-                                <p className="text-gray-800">{initialAnalysis.cropName}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-600 font-medium">Health Status</p>
-                                <p className="text-gray-800">{initialAnalysis.healthStatus}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-600 font-medium">Confidence</p>
-                                <p className="text-gray-800">{initialAnalysis.confidence}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-600 font-medium">Mode</p>
-                                <p className="text-gray-800">Voice Only</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                <CropInfoCard analysis={initialAnalysis} />
 
                 {/* Example Questions */}
-                <Card className="mt-6 border-green-200 bg-green-50">
-                    <CardHeader>
-                        <CardTitle className="text-md text-green-800">Example Questions</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="space-y-2 text-sm text-green-700">
-                            <li>• "What treatment should I apply for this disease?"</li>
-                            <li>• "How can I prevent this problem in future?"</li>
-                            <li>• "When should I harvest this crop?"</li>
-                            <li>• "What fertilizer is best for this crop?"</li>
-                            <li>• "How much water does this crop need?"</li>
-                        </ul>
-                    </CardContent>
-                </Card>
+                <ExampleQuestionsCard />
             </div>
         </div>
     )
